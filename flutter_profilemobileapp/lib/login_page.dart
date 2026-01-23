@@ -84,8 +84,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       Text(
                         "LOGIN",
                         style: TextStyle(
-                          fontSize: 24.0,
+                          fontSize: 30.0,
                           fontFamily: 'IBMPlexSans',
+                          fontWeight: FontWeight.w700,
                         )
                       ),
                       
