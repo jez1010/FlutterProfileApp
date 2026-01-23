@@ -72,7 +72,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 Container(
                   height: containerHeight,
 
+                  padding: EdgeInsets.all(20),
+
                   decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
                     color: Color(0xFFFFFFFF),
                   ),
                   
