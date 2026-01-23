@@ -31,7 +31,9 @@ class LoginScreen extends StatefulWidget {
 } 
  
 class _LoginScreenState extends State<LoginScreen> { 
- 
+  //variables
+  final _loginForm = GlobalKey<FormState>();
+  
   @override 
   Widget build(BuildContext context) { 
     return Scaffold(
@@ -39,8 +41,47 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Column(
           children: [
             Text(
-              "Login"
-            )
+              "LOGIN"
+            ),
+            
+            //The Actual Login Form
+            Container(
+              child: Form(
+                key: _loginForm,
+                child: Column(
+                  children: [
+                    TextFormField(
+                      decoration: InputDecoration(
+                        labelText: 'Email',
+                        hintText: 'Enter email here.',
+                      ),
+
+                      validator: (value){
+                        if (value == null || value.isEmpty){
+                          return 'Input required.';
+                        }
+                        return null;
+                      },
+                    ),
+
+                    TextFormField(
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        labelText: 'Password',
+                        hintText: 'Enter your password here.',
+                      ),
+
+                      validator: (value){
+                        if (value == null || value.isEmpty){
+                          return 'Input required.';
+                        }
+                        return null;
+                      },
+                    ),
+                  ]
+                )
+              )
+            ),
           ]
         )
       )
