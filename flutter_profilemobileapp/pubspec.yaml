@@ -102,6 +102,16 @@ flutter:
           weight: 700
         - asset: assets/fonts/IBM_Plex_Sans/static/IBMPlexSans-SemiBold.ttf
           weight: 600
+        - asset: assets/fonts/IBM_Plex_Sans/static/IBMPlexSans-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/IBM_Plex_Sans/static/IBMPlexSans-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/IBM_Plex_Sans/static/IBMPlexSans-Light.ttf
+          weight: 300
+        - asset: assets/fonts/IBM_Plex_Sans/static/IBMPlexSans-ExtraLight.ttf
+          weight: 200
+        - asset: assets/fonts/IBM_Plex_Sans/static/IBMPlexSans-Thin.ttf
+          weight: 100
 
 
   # For details regarding fonts from package dependencies,
