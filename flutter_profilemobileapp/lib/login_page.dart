@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:video_player/video_player.dart';
+import 'main_page.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(LoginPage());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class LoginPage extends StatelessWidget {
+  const LoginPage({super.key});
 
   // This widget is the root of your application.
 
@@ -46,14 +48,19 @@ class _LoginScreenState extends State<LoginScreen> {
           image: DecorationImage(
             image: NetworkImage('https://media1.tenor.com/m/Al8FHubXhZsAAAAd/max-verstappen-donuts.gif'),
             fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(
+              Colors.black.withValues(alpha: 0.5),
+              BlendMode.darken,
+            )
           ),
         ),
+        
         child: Center(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                height: 450,
+                height: 500,
                 width: 350,
 
                 clipBehavior: Clip.antiAlias,
@@ -189,7 +196,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                                     'Form Completed',
                                                   ),
                                                   content: Text(
-                                                    'All fields completed. Confirm?',
+                                                    'Successfully logged in. Hello.',
                                                   ),
                                                   actions: [
                                                     TextButton(
@@ -202,9 +209,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                                     ),
                                                     TextButton(
                                                       onPressed: () =>
-                                                          Navigator.pop(
+                                                          Navigator.push(
                                                             context,
-                                                            'OK',
+                                                            MaterialPageRoute(builder: (context) => const ProfilePage())
                                                           ),
                                                       child: Text('OK'),
                                                     ),
