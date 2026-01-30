@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:video_player/video_player.dart';
 import 'main_page.dart';
 
 void main() {
@@ -72,11 +71,17 @@ class _LoginScreenState extends State<LoginScreen> {
                     begin: Alignment.topLeft,
                     end: Alignment.centerRight,
 
-                    colors: [Color(0xFF2D27D7), Color(0xFF191755)],
+                    colors: [
+                      Color(0xFF2D27D7),
+                      Color(0xFF191755),
+                    ],
                   ),
 
                   boxShadow: [
-                    BoxShadow(color: Color(0xBF000000), blurRadius: 7),
+                    BoxShadow(
+                      color: Color(0xBF000000), 
+                      blurRadius: 7
+                    ),
                   ],
                 ),
 
