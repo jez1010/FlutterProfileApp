@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_profilemobileapp/screens/login_page.dart';
+import 'login_page.dart';
+import '../main.dart';
 
+void main(){
+  runApp(ProfilePage());
+}
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -57,9 +61,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           padding: EdgeInsets.zero,
           children: [
             ListTile(
-              leading: Icon(Icons.login),
-              title: Text("Login"),
-              onTap:(){
+              leading: Icon(Icons.logout),
+              title: Text("Logout"),
+              onTap:() async {
                 Navigator.pop(context);
                 Navigator.push(
                   context,

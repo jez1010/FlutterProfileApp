@@ -3,20 +3,36 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'screens/login_page.dart';
-import 'screens/main_page.dart';
+import 'screens/profile_page.dart';
 
 Future<void> main() async{
-  WidgetsFlutterBinding.ensureInitialized;
-  await dotenv.load(fileName: ".env");
+  WidgetsFlutterBinding.ensureInitialized();
+  try {
+    await dotenv.load(fileName: ".env");
 
-  await Supabase.initialize(
-    url: dotenv.env['SUPABASE_URL']!,
-    anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
-  );
+    final url = dotenv.env['SUPABASE_URL'];
+    final anonKey = dotenv.env['SUPABASE_ANON_KEY'];
+
+    if (url ==null){
+      throw Exception("Missing url");
+    }
+
+    if (url ==anonKey){
+      throw Exception("Missing anonKey");
+    }
+
+    await Supabase.initialize(
+      url: dotenv.env['SUPABASE_URL']!,
+      anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
+    );
+  } catch (e) {
+    debugPrint("Initialization Error: $e");
+    return;
+  }
   runApp(const MyApp());
 }
 
-final supabase = Supabase.instance.client;
+SupabaseClient get supabase => Supabase.instance.client;
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

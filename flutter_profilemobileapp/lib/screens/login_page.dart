@@ -1,13 +1,25 @@
 import 'package:flutter/material.dart';
-import 'main_page.dart';
+import 'profile_page.dart';
 import '../main.dart';
+
+void main() {
+  runApp(LoginPage());
+}
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const LoginScreen(title: 'Login');
+    return MaterialApp(
+      title: 'Flutter Demo',
+
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Color(0xFF686868)),
+        fontFamily: 'IBMPlexSans',
+      ),
+      home: const LoginScreen(title: 'Flutter Demo Home Page'),
+    );
   }
 }
 
@@ -26,15 +38,59 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  Future <void> _signIn() async {
+  Future<void> _signIn() async {
     try {
-      await supabase.auth.signInWithPassword(
+      final response = await supabase.auth.signInWithPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
+      if (response.user != null && mounted){
+        _successMessage();
+      }
     } catch (e) {
-
+      _errorMessage();
     }
+  }
+
+  void _errorMessage() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        content: Text('Failed to authenticate. Try again later.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'Cancel'),
+            child: Text('Cancel'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _successMessage() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text('Form Completed'),
+        content: Text('Successfully logged in. Hello.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'Cancel'),
+            child: Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ProfilePage()),
+              );
+            },
+            child: Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -52,15 +108,17 @@ class _LoginScreenState extends State<LoginScreen> {
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: NetworkImage('https://media1.tenor.com/m/Al8FHubXhZsAAAAd/max-verstappen-donuts.gif'),
+            image: NetworkImage(
+              'https://media1.tenor.com/m/Al8FHubXhZsAAAAd/max-verstappen-donuts.gif',
+            ),
             fit: BoxFit.cover,
             colorFilter: ColorFilter.mode(
               Colors.black.withValues(alpha: 0.5),
               BlendMode.darken,
-            )
+            ),
           ),
         ),
-        
+
         child: Center(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -78,17 +136,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     begin: Alignment.topLeft,
                     end: Alignment.centerRight,
 
-                    colors: [
-                      Color(0xFF2D27D7),
-                      Color(0xFF191755),
-                    ],
+                    colors: [Color(0xFF2D27D7), Color(0xFF191755)],
                   ),
 
                   boxShadow: [
-                    BoxShadow(
-                      color: Color(0xBF000000), 
-                      blurRadius: 7
-                    ),
+                    BoxShadow(color: Color(0xBF000000), blurRadius: 7),
                   ],
                 ),
 
@@ -133,6 +185,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       child: Column(
                                         children: [
                                           TextFormField(
+                                            controller: _emailController,
                                             decoration: InputDecoration(
                                               labelText: 'Email',
                                               hintText: 'Enter email here.',
@@ -148,6 +201,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                           ),
 
                                           TextFormField(
+                                            controller: _passwordController,
                                             obscureText: true,
                                             decoration: InputDecoration(
                                               labelText: 'Password',
@@ -199,36 +253,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                                       onPressed: () {
                                         if (_loginForm.currentState!.validate()) {
-                                          showDialog(
-                                            context: context,
-                                            builder: (BuildContext context) =>
-                                                AlertDialog(
-                                                  title: const Text(
-                                                    'Form Completed',
-                                                  ),
-                                                  content: Text(
-                                                    'Successfully logged in. Hello.',
-                                                  ),
-                                                  actions: [
-                                                    TextButton(
-                                                      onPressed: () =>
-                                                          Navigator.pop(
-                                                            context,
-                                                            'Cancel',
-                                                          ),
-                                                      child: Text('Cancel'),
-                                                    ),
-                                                    TextButton(
-                                                      onPressed: () =>
-                                                          Navigator.push(
-                                                            context,
-                                                            MaterialPageRoute(builder: (context) => const ProfilePage())
-                                                          ),
-                                                      child: Text('OK'),
-                                                    ),
-                                                  ],
-                                                ),
-                                          );
+                                          _signIn();
                                         }
                                       },
                                     ),
