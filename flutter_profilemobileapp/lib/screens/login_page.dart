@@ -28,25 +28,14 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  Future<void> _signIn() async {
+  Future <void> _signIn() async {
     try {
       await supabase.auth.signInWithPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
     } catch (e) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) => AlertDialog(
-          title: const Text("Failed to connect. Please try again."),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text('OK'),
-            ),
-          ],
-        ),
-      );
+
     }
   }
 
@@ -65,17 +54,15 @@ class _LoginScreenState extends State<LoginScreen> {
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: NetworkImage(
-              'https://media1.tenor.com/m/Al8FHubXhZsAAAAd/max-verstappen-donuts.gif',
-            ),
+            image: NetworkImage('https://media1.tenor.com/m/Al8FHubXhZsAAAAd/max-verstappen-donuts.gif'),
             fit: BoxFit.cover,
             colorFilter: ColorFilter.mode(
               Colors.black.withValues(alpha: 0.5),
               BlendMode.darken,
-            ),
+            )
           ),
         ),
-
+        
         child: Center(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -93,11 +80,17 @@ class _LoginScreenState extends State<LoginScreen> {
                     begin: Alignment.topLeft,
                     end: Alignment.centerRight,
 
-                    colors: [Color(0xFF2D27D7), Color(0xFF191755)],
+                    colors: [
+                      Color(0xFF2D27D7),
+                      Color(0xFF191755),
+                    ],
                   ),
 
                   boxShadow: [
-                    BoxShadow(color: Color(0xBF000000), blurRadius: 7),
+                    BoxShadow(
+                      color: Color(0xBF000000), 
+                      blurRadius: 7
+                    ),
                   ],
                 ),
 
@@ -207,8 +200,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       child: Text('Submit'),
 
                                       onPressed: () {
-                                        if (_loginForm.currentState!
-                                            .validate()) {
+                                        if (_loginForm.currentState!.validate()) {
                                           showDialog(
                                             context: context,
                                             builder: (BuildContext context) =>
@@ -229,13 +221,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                                       child: Text('Cancel'),
                                                     ),
                                                     TextButton(
-                                                      onPressed: () => Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              const ProfilePage(),
-                                                        ),
-                                                      ),
+                                                      onPressed: () =>
+                                                          Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(builder: (context) => const ProfilePage())
+                                                          ),
                                                       child: Text('OK'),
                                                     ),
                                                   ],
