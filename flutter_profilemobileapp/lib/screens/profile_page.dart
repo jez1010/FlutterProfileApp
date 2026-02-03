@@ -43,7 +43,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       appBar: AppBar(
         title: const Text(
-          "Jez's Profile",
+          "Your Profile",
           style: TextStyle(
             color: Color(0xFFFFFFFF)
           ),
@@ -99,7 +99,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   )
                 ),
 
+                Positioned(
+                  top: 70,
+                  child: Container(
+                    width: 150,
+                    height: 150,
 
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Color(0xFFFFFFFF),
+                    ),
+                  )
+                ),
               ]
             )
           ],
