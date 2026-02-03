@@ -6,7 +6,7 @@ import 'screens/login_page.dart';
 import 'screens/main_page.dart';
 
 Future<void> main() async{
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized;
   await dotenv.load(fileName: ".env");
 
   await Supabase.initialize(

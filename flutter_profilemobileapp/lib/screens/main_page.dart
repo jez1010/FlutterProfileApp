@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_profilemobileapp/screens/login_page.dart';
 
-void main() => runApp(ProfilePage());
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
