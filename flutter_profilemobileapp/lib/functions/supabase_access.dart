@@ -31,6 +31,7 @@ Future<List<dynamic>> getProfileDetails() async{
     names,
     response['social_media'],
     response['description'],
+    response['photo_link']
   ];
 
   return details;
