@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'login_page.dart';
 import '../main.dart';
+import '../functions/supabase_access.dart';
+import '../functions/functions.dart';
 
 void main(){
   runApp(ProfilePage());
@@ -35,6 +37,89 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   //variables
+  List<dynamic>? profileData;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfile();
+  }
+
+  final ProfileRepository _repository = ProfileRepository();
+
+  Future<void> _loadProfile() async {
+    await Future.delayed(Duration(milliseconds: 500));
+    final data = await _repository.getProfileDetails();
+
+    if (mounted) {
+      setState((){
+        profileData = data;
+        isLoading = false;
+      });
+    }
+  }
+
+  Widget _pageContents() {
+    return ListView(
+      padding: EdgeInsets.zero,
+      children: [
+        Stack(
+          alignment: Alignment.center,
+
+          children: [
+            Container(
+              width: double.infinity,
+              height: 300,
+
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+
+                  colors: [Color(0xFF2D27D7), Color(0xFF191755)],
+                ),
+              ),
+            ),
+
+            Positioned(
+              top: 70,
+              child: Container(
+                width: 150,
+                height: 150,
+
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Color(0xFFFFFFFF),
+                  image: DecorationImage(
+                    image: NetworkImage(profileData![5].toString()),
+                    fit: BoxFit.cover,
+                  )
+                ),
+
+              ),
+            ),
+
+            Positioned(
+              bottom: 30,
+              child: Container(
+                margin: EdgeInsets.only(top: 10),
+
+                child: Text(
+                  profileData![1].toString(),
+                  style: TextStyle(
+                    color: Color(0xFFFFFFFF),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 30,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,47 +160,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
         )
       ),
 
-      body: Container(
-        child: Column(
-          children: [
-            Stack(
-              alignment: Alignment.center,
-
-              children:[
-                Container(
-                  width: double.infinity,
-                  height: 300,
-
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      
-                      colors: [
-                        Color(0xFF2D27D7),
-                        Color(0xFF191755)
-                      ]
-                    )
-                  )
-                ),
-
-                Positioned(
-                  top: 70,
-                  child: Container(
-                    width: 150,
-                    height: 150,
-
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Color(0xFFFFFFFF),
-                    ),
-                  )
-                ),
-              ]
-            )
-          ],
-        )
-      )
+      body: AnimatedSwitcher(
+        duration: Duration(milliseconds: 500),
+        child: profileData == null
+          ? Center(key: UniqueKey(), child: CircularProgressIndicator())
+          : _pageContents()
+      ),
     );
   }
 }

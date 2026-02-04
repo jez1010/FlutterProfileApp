@@ -72,7 +72,12 @@ class _LoginScreenState extends State<LoginScreen> {
       context: context,
       builder: (BuildContext context) => AlertDialog(
         title: const Text('Form Completed'),
-        content: Text('Successfully logged in. Hello.'),
+        content: Column(
+          children: [
+            Text('Successfully logged in. Hello.'),
+            Text(supabase.auth.currentUser?.id ?? "ID was not retrieved."),
+          ]
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, 'Cancel'),
