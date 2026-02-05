@@ -281,10 +281,10 @@ class _LoginScreenState extends State<LoginScreen> {
                               shape: BoxShape.circle,
                               color: Color(0xFF232738),
                             ),
-                            child: Icon(
-                              Icons.account_circle_sharp,
-                              size: 150,
-                              color: Color(0xFFFFFFFF),
+                            child: Image.asset(
+                              'assets/images/logo.png',
+                              width: 150,
+                              height: 150,
                             ),
                           ),
                         ),
