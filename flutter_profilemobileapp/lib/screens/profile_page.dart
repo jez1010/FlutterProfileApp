@@ -92,7 +92,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   shape: BoxShape.circle,
                   color: Color(0xFFFFFFFF),
                   image: DecorationImage(
-                    image: NetworkImage(profileData![5].toString()),
+                    image: profileData![5].toString() != "DEFAULT_PROFILE"
+                      ? NetworkImage(profileData![5].toString())
+                      : NetworkImage('https://mmudgmsuskxpcbinqrpu.supabase.co/storage/v1/object/public/ProfileImages/default_profile.jpg'),
                     fit: BoxFit.cover,
                   )
                 ),

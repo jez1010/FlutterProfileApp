@@ -32,11 +32,13 @@ class ProfileRepository {
       return [userId, "DEfault Username", "Default Name", "Default Social Media", "Default Description", "Default Photo URL"];
     }
 
+    String name1 = response['first_name'] ?? "";
+    String name2 = response['last_name'] ?? "";
     String names = "";
-    if (response['first_name'] != "" && response['last_name'] != ""){
-      String name1 = response['first_name'];
-      String name2 = response['last_name'];
+    if (name1.isNotEmpty || name2.isNotEmpty) {
       names = "$name1 $name2";
+    } else {
+      names = name1.isNotEmpty ? name1 : name2;
     }
     
     final List<dynamic> details = [
