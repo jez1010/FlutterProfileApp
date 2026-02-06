@@ -1,6 +1,11 @@
+//dart-flutter libraries
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+
+//main file
+import '../main.dart';
+
+//localfiles
 import '../functions/supabase_access.dart';
 import '../functions/functions.dart';
 
@@ -46,25 +51,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
-  //image uploading
-  File? _selectedImage;
-  final ImageService _imageService = ImageService();
-
-  void _handleImageButton() async {
-    File? image = await _imageService.pickImage();
-
-    if (image != null){
-      setState(() {
-        _selectedImage = image;
-      });
-    }
-  }
-
   //the actual page content
   @override
   Widget build(BuildContext context) {
-    final imageToDisplay = _selectedImage;
-
     return Scaffold(
       extendBodyBehindAppBar: true,
 
@@ -193,44 +182,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       return null;
                     },
                   ),
-                  
-                  TextButton(
-                    onPressed: () async {
-                      _handleImageButton();
-                    },
-
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.camera_alt),
-                            SizedBox(width: 5),
-                            Text("Choose an Image"),
-                          ]
-                        ),
-
-                        Visibility(
-                          visible: imageToDisplay != null,
-                          child: Container(
-                            width: 100,
-                            height: 100,
-
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Color(0xFFFFFFFF),
-                              image: imageToDisplay != null
-                                ? DecorationImage(
-                                  image: FileImage(imageToDisplay),
-                                  fit: BoxFit.cover,
-                                )
-                                : null,
-                            ),
-                          ),
-                        )
-                      ]
-                    ),
-                  ),
 
                   TextFormField(
                     controller: _confirmPasswordController,
@@ -253,6 +204,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
 
           //submission button
+          
         ],
       ),
     );

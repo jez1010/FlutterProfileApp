@@ -1,7 +1,13 @@
+//dart-flutter libraries
 import 'package:flutter/material.dart';
+import 'dart:io';
+
+//main file
+import '../main.dart';
+
+//localfiles
 import 'profile_page.dart';
 import 'register_page.dart';
-import '../main.dart';
 
 void main() {
   runApp(LoginPage());
