@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'profile_page.dart';
+import 'register_page.dart';
 import '../main.dart';
 
 void main() {
@@ -34,6 +35,8 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   //variables
+
+  //login forms
   final _loginForm = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -52,6 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  //status messages
   void _errorMessage() {
     showDialog(
       context: context,
@@ -98,6 +102,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  //removing form contents
   @override
   void dispose() {
     _emailController.dispose();
@@ -105,6 +110,7 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
+  //the actual page content
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -129,7 +135,7 @@ class _LoginScreenState extends State<LoginScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                height: 500,
+                height: 550,
                 width: 350,
 
                 clipBehavior: Clip.antiAlias,
@@ -184,83 +190,122 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
 
                                   //The Actual Login Form
-                                  Container(
-                                    child: Form(
-                                      key: _loginForm,
-                                      child: Column(
-                                        children: [
-                                          TextFormField(
-                                            controller: _emailController,
-                                            decoration: InputDecoration(
-                                              labelText: 'Email',
-                                              hintText: 'Enter email here.',
-                                            ),
-
-                                            validator: (value) {
-                                              if (value == null ||
-                                                  value.isEmpty) {
-                                                return 'Input required.';
-                                              }
-                                              return null;
-                                            },
+                                  Form(
+                                    key: _loginForm,
+                                    child: Column(
+                                      children: [
+                                        TextFormField(
+                                          controller: _emailController,
+                                          decoration: InputDecoration(
+                                            labelText: 'Email',
+                                            hintText: 'Enter email here.',
                                           ),
-
-                                          TextFormField(
-                                            controller: _passwordController,
-                                            obscureText: true,
-                                            decoration: InputDecoration(
-                                              labelText: 'Password',
-                                              hintText:
-                                                  'Enter your password here.',
-                                            ),
-
-                                            validator: (value) {
-                                              if (value == null ||
-                                                  value.isEmpty) {
-                                                return 'Input required.';
-                                              }
-                                              return null;
-                                            },
+                                  
+                                          validator: (value) {
+                                            if (value == null ||
+                                                value.isEmpty) {
+                                              return 'Input required.';
+                                            }
+                                            return null;
+                                          },
+                                        ),
+                                  
+                                        TextFormField(
+                                          controller: _passwordController,
+                                          obscureText: true,
+                                          decoration: InputDecoration(
+                                            labelText: 'Password',
+                                            hintText:
+                                                'Enter your password here.',
                                           ),
-                                        ],
-                                      ),
+                                  
+                                          validator: (value) {
+                                            if (value == null ||
+                                                value.isEmpty) {
+                                              return 'Input required.';
+                                            }
+                                            return null;
+                                          },
+                                        ),
+                                      ],
                                     ),
                                   ),
 
+                                  //submission buttons
                                   Container(
                                     margin: EdgeInsets.all(20),
 
                                     alignment: Alignment.center,
 
-                                    child: TextButton(
-                                      style: TextButton.styleFrom(
-                                        backgroundColor: Color(0xFF0F0A8F),
-                                        disabledForegroundColor: Color(
-                                          0xFF030231,
-                                        ),
+                                    child: Column(
+                                      children: [
+                                        //submit
+                                        TextButton(
+                                          style: TextButton.styleFrom(
+                                            backgroundColor: Color(0xFF0F0A8F),
+                                            disabledForegroundColor: Color(
+                                              0xFF030231,
+                                            ),
 
-                                        foregroundColor: Color(0xFFFFFFFF),
+                                            foregroundColor: Color(0xFFFFFFFF),
 
-                                        textStyle: TextStyle(
-                                          fontSize: 15.0,
-                                          fontFamily: 'IBMPlexSans',
-                                          fontWeight: FontWeight.w500,
-                                        ),
+                                            textStyle: TextStyle(
+                                              fontSize: 15.0,
+                                              fontFamily: 'IBMPlexSans',
+                                              fontWeight: FontWeight.w500,
+                                            ),
 
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            10,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(
+                                                10,
+                                              ),
+                                            ),
                                           ),
+
+                                          child: Text('Submit'),
+
+                                          onPressed: () {
+                                            if (_loginForm.currentState!.validate()) {
+                                              _signIn();
+                                            }
+                                          },
                                         ),
-                                      ),
+                                        
+                                        Text("or"),
 
-                                      child: Text('Submit'),
+                                        //register
+                                        TextButton(
+                                          style: TextButton.styleFrom(
+                                            backgroundColor: Color(0xFF0F0A8F),
+                                            disabledForegroundColor: Color(
+                                              0xFF030231,
+                                            ),
 
-                                      onPressed: () {
-                                        if (_loginForm.currentState!.validate()) {
-                                          _signIn();
-                                        }
-                                      },
+                                            foregroundColor: Color(0xFFFFFFFF),
+
+                                            textStyle: TextStyle(
+                                              fontSize: 15.0,
+                                              fontFamily: 'IBMPlexSans',
+                                              fontWeight: FontWeight.w500,
+                                            ),
+
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(
+                                                10,
+                                              ),
+                                            ),
+                                          ),
+
+                                          child: Text('Sign up'),
+
+                                          onPressed: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(builder: (context) => const RegisterPage()),
+                                            );
+                                          },
+                                        ),
+                                      ]
                                     ),
                                   ),
                                 ],

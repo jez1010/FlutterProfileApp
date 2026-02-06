@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'login_page.dart';
-import '../main.dart';
 import '../functions/supabase_access.dart';
-import '../functions/functions.dart';
 
 void main(){
   runApp(ProfilePage());
@@ -98,7 +96,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     fit: BoxFit.cover,
                   )
                 ),
-
               ),
             ),
 
