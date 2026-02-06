@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'profile_page.dart';
-import '../main.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import '../functions/supabase_access.dart';
+import '../functions/functions.dart';
 
 void main() {
   runApp(RegisterPage());
@@ -34,6 +36,8 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   //variables
+
+  //text fields
   final _registerForm = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _usernameController = TextEditingController();
@@ -42,8 +46,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
+  //image uploading
+  File? _selectedImage;
+  final ImageService _imageService = ImageService();
+
+  void _handleImageButton() async {
+    File? image = await _imageService.pickImage();
+
+    if (image != null){
+      setState(() {
+        _selectedImage = image;
+      });
+    }
+  }
+
+  //the actual page content
   @override
   Widget build(BuildContext context) {
+    final imageToDisplay = _selectedImage;
+
     return Scaffold(
       extendBodyBehindAppBar: true,
 
@@ -91,6 +112,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
           ),
 
+          //the registration form
           Container(
             margin: EdgeInsets.all(20),
             child: Form(
@@ -105,7 +127,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       hintText: 'Enter email here.',
 
                       filled: true,
-                      fillColor: Colors.grey[200],
+                      fillColor: const Color(0xFFEEEEEE),
                       
                     ),
 
@@ -132,7 +154,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     },
                   ),
 
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          controller: _firstNameController,
+                          decoration: InputDecoration(
+                            labelText: 'First Name',
+                          )
+                        ),
+                      ),
                   
+                      SizedBox(width: 15),
+                  
+                      Expanded(
+                        child: TextFormField(
+                          controller: _lastNameController,
+                          decoration: InputDecoration(
+                            labelText: 'Last Name',
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
 
                   TextFormField(
                     controller: _passwordController,
@@ -148,6 +192,44 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       }
                       return null;
                     },
+                  ),
+                  
+                  TextButton(
+                    onPressed: () async {
+                      _handleImageButton();
+                    },
+
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.camera_alt),
+                            SizedBox(width: 5),
+                            Text("Choose an Image"),
+                          ]
+                        ),
+
+                        Visibility(
+                          visible: imageToDisplay != null,
+                          child: Container(
+                            width: 100,
+                            height: 100,
+
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Color(0xFFFFFFFF),
+                              image: imageToDisplay != null
+                                ? DecorationImage(
+                                  image: FileImage(imageToDisplay),
+                                  fit: BoxFit.cover,
+                                )
+                                : null,
+                            ),
+                          ),
+                        )
+                      ]
+                    ),
                   ),
 
                   TextFormField(
@@ -169,6 +251,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
             ),
           ),
+
+          //submission button
         ],
       ),
     );
