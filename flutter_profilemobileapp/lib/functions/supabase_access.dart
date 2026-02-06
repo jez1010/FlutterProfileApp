@@ -10,6 +10,40 @@ String getUser(){
   return "NO_USER_LOGGED_IN";
 }
 
+//register a new user
+class RegisteringNewUsers {
+  Future<void> signUpNewUser(
+    String email,
+    String username, //varchar
+    String firstName,//varchar
+    String lastName, //varchar
+    String socialMedia, //jsonb
+    String description, //text
+    String password,
+  ) async {
+    try {
+      final authResponse = await supabase.auth.signUp(
+        email: email,
+        password: password,
+      );
+
+      final String? userId = authResponse.user?.id;
+
+      if (userId != null){
+        await supabase.from('PROFILES').insert({
+          'user_id': userId,
+          'username': username,
+          'first_name': firstName,
+          'last_name': lastName,
+        });
+      }
+    } catch (e) {
+      print("Registration failed: $e");
+    }
+  }
+}
+
+
 //grab profile and store it on local
 class ProfileRepository {
   static List<dynamic>? _cachedProfile;
