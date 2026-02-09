@@ -35,6 +35,7 @@ class RegisteringNewUsers {
           'username': username,
           'first_name': firstName,
           'last_name': lastName,
+          'description': description,
         });
       }
     } catch (e) {

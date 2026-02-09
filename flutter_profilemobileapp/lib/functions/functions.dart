@@ -4,6 +4,19 @@ import 'package:image_picker/image_picker.dart';
 class ProfileManagement {
 }
 
+class SocialsData {
+  String key;
+  String value;
+  SocialsData({this.key = '', this.value = ''});
+}
+
+class FormFunctions {
+  void _onRowChanged() {
+
+  }
+}
+
+//deprecated class cus i cant make ts work
 class ImageService {
   final ImagePicker _picker = ImagePicker();
 
