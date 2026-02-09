@@ -50,9 +50,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
-  bool _firstField = false;
-  bool _secondField = false;
-
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
   final _descController = TextEditingController();
@@ -161,123 +158,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       margin: EdgeInsets.only(top: 10),
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        "Password",
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ),
-                    TextFormField(
-                      controller: _passwordController,
-                      obscureText: !_firstField,
-                      decoration: InputDecoration(
-                        hintText: 'Enter password',
-
-                        contentPadding: EdgeInsets.symmetric(horizontal: 2),
-                        filled: true,
-                        fillColor: const Color(0xFFEEEEEE),
-
-                        enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(
-                            color: const Color(0xFF8D8D8D),
-                          ),
-                          borderRadius: BorderRadius.zero,
-                        ),
-
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Color(0xFF2D27D7),
-                            width: 2,
-                          ),
-                          borderRadius: BorderRadius.zero,
-                        ),
-                      ),
-                      style: TextStyle(fontSize: 15),
-
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Input required.';
-                        } else if (value.length < 8){
-                          return 'The password must be at least 8 characters';
-                        }
-                        if (!value.contains(RegExp(r'[A-Z]'))) return 'Add a capital letter.';
-                        if (!value.contains(RegExp(r'[0-9]'))) return 'Add a number.';
-                        if (value.contains(' ')) return 'Remove spaces.';
-                        return null;
-                      },
-                    ),
-
-                    Container(
-                      margin: EdgeInsets.only(top: 10),
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        "Confirm Password",
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ),
-                    TextFormField(
-                      controller: _confirmPasswordController,
-                      obscureText: !_secondField,
-                      decoration: InputDecoration(
-                        hintText: 'Reenter previous password here.',
-                        contentPadding: EdgeInsets.symmetric(horizontal: 2),
-                        filled: true,
-                        fillColor: const Color(0xFFEEEEEE),
-
-                        enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(
-                            color: const Color(0xFF8D8D8D),
-                          ),
-                          borderRadius: BorderRadius.zero,
-                        ),
-
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Color(0xFF2D27D7),
-                            width: 2,
-                          ),
-                          borderRadius: BorderRadius.zero,
-                        ),
-                      ),
-                      style: TextStyle(fontSize: 15),
-
-                      validator: (value) {
-                        if (value != _passwordController.text) {
-                          return 'Input does not match previous field input.';
-                        }
-                        return null;
-                      },
-                    ),
-
-
-                    SizedBox(height: 20),
-
-                    Divider(
-                      color: const Color(0xFF6D6D6D),
-                      thickness: 0.25,
-                      height: 11,
-                    ),
-
-                    Container(
-                      margin: EdgeInsets.only(top: 10, bottom: 10),
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        "Details and Personalization",
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w300,
-                        ),
-                      ),
-                    ),
-
-                    Container(
-                      margin: EdgeInsets.only(top: 10),
-                      alignment: Alignment.centerLeft,
-                      child: Text(
                         "Username",
                         style: TextStyle(
                           fontSize: 12,
@@ -316,6 +196,116 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         }
                         return null;
                       },
+                    ),
+
+                    Container(
+                      margin: EdgeInsets.only(top: 10),
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        "Password",
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ),
+                    TextFormField(
+                      controller: _passwordController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        hintText: 'Enter password here.',
+                        contentPadding: EdgeInsets.symmetric(horizontal: 2),
+                        filled: true,
+                        fillColor: const Color(0xFFEEEEEE),
+                        enabledBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(
+                            color: const Color(0xFF8D8D8D),
+                          ),
+                          borderRadius: BorderRadius.zero,
+                        ),
+
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Color(0xFF2D27D7),
+                            width: 2,
+                          ),
+                          borderRadius: BorderRadius.zero,
+                        ),
+                      ),
+                      style: TextStyle(fontSize: 15),
+
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Input required.';
+                        }
+                        return null;
+                      },
+                    ),
+
+                    Container(
+                      margin: EdgeInsets.only(top: 10),
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        "Confirm Password",
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ),
+                    TextFormField(
+                      controller: _confirmPasswordController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        hintText: 'Reenter previous password here.',
+                        contentPadding: EdgeInsets.symmetric(horizontal: 2),
+                        filled: true,
+                        fillColor: const Color(0xFFEEEEEE),
+
+                        enabledBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(
+                            color: const Color(0xFF8D8D8D),
+                          ),
+                          borderRadius: BorderRadius.zero,
+                        ),
+
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Color(0xFF2D27D7),
+                            width: 2,
+                          ),
+                          borderRadius: BorderRadius.zero,
+                        ),
+                      ),
+                      style: TextStyle(fontSize: 15),
+
+                      validator: (value) {
+                        if (value == null ||
+                            value != _passwordController.text) {
+                          return 'Input required.';
+                        }
+                        return null;
+                      },
+                    ),
+
+                    SizedBox(height: 20),
+
+                    Divider(
+                      color: const Color(0xFF6D6D6D),
+                      thickness: 0.25,
+                      height: 11,
+                    ),
+
+                    Container(
+                      margin: EdgeInsets.only(top: 10, bottom: 10),
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        "Details and Personalization",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w300,
+                        ),
+                      ),
                     ),
 
                     Row(
@@ -361,6 +351,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 style: TextStyle(fontSize: 15),
 
                                 validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Input required.';
+                                  }
                                   return null;
                                 },
                               ),
@@ -411,6 +404,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 style: TextStyle(fontSize: 15),
 
                                 validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Input required.';
+                                  }
                                   return null;
                                 },
                               ),
@@ -499,6 +495,56 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                       ),
                     ),
+
+                    Container(
+                      margin: EdgeInsets.only(top: 10),
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        "Description",
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ),
+                    TextFormField(
+                      keyboardType: TextInputType.multiline,
+                      maxLines: 5,
+                      maxLength: 200,
+                      controller: _descController,
+                      decoration: InputDecoration(
+                        hintText: 'Tell us about yourself...',
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 2,
+                          vertical: 15,
+                        ),
+                        filled: true,
+                        fillColor: const Color(0xFFEEEEEE),
+
+                        enabledBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(
+                            color: const Color(0xFF8D8D8D),
+                          ),
+                          borderRadius: BorderRadius.zero,
+                        ),
+
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Color(0xFF2D27D7),
+                            width: 2,
+                          ),
+                          borderRadius: BorderRadius.zero,
+                        ),
+                      ),
+                      style: TextStyle(fontSize: 15),
+
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Input required.';
+                        }
+                        return null;
+                      },
+                    ),
                   ],
                 ),
 
@@ -531,9 +577,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
 
                 child: Text("Submit"),
-                onPressed: () {
-                  _registerForm.currentState!.validate();
-                },
+                onPressed: () {},
               ),
             )
           ],
