@@ -1,10 +1,11 @@
 //dart-flutter libraries
 import 'package:flutter/material.dart';
 import 'package:flutter_profilemobileapp/main.dart';
+import 'dart:convert';
 
 //local files
 import 'login_page.dart';
-import '../functions/supabase_access.dart';
+import '../functions/functions.dart';
 
 void main(){
   runApp(ProfilePage());
@@ -63,6 +64,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _pageContents() {
+    print("Response from profile_page: ${profileData.toString()}");
     return ListView(
       padding: EdgeInsets.zero,
       children: [
@@ -72,7 +74,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [
             Container(
               width: double.infinity,
-              height: 300,
+              height: 200,
+
+              padding: EdgeInsets.only(
+                top: 70,
+                left: 10,
+                right: 10,
+                bottom: 20,
+              ),
 
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -82,43 +91,104 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   colors: [Color(0xFF2D27D7), Color(0xFF191755)],
                 ),
               ),
-            ),
 
-            Positioned(
-              top: 70,
-              child: Container(
-                width: 150,
-                height: 150,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Row(
+                  children: [
+                    Container(
+                      width: 125,
+                      height: 125,
 
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Color(0xFFFFFFFF),
-                  image: DecorationImage(
-                    image: !profileData![5].toString().startsWith("DEFAULT_PROFILE_")
-                      ? NetworkImage(profileData![5].toString())
-                      : AssetImage('assets/images/defaults/${profileData![5].toString()}.png'),
-                    fit: BoxFit.cover,
-                  )
-                ),
-              ),
-            ),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Color(0xFFFFFFFF),
+                        image: DecorationImage(
+                          image:
+                              !profileData![6].toString().startsWith("DEFAULT_PROFILE_")
+                                ? NetworkImage(profileData![6].toString())
+                                : AssetImage('assets/images/defaults/${profileData![6].toString()}.png'),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
 
-            Positioned(
-              bottom: 30,
-              child: Container(
-                margin: EdgeInsets.only(top: 10),
+                    SizedBox(
+                      width: 10,
+                    ),
 
-                child: Text(
-                  profileData![1].toString(),
-                  style: TextStyle(
-                    color: Color(0xFFFFFFFF),
-                    fontWeight: FontWeight.bold,
-                    fontSize: 30,
-                  ),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            profileData![3].toString().isEmpty
+                            ? profileData![2].toString()
+                            : profileData![3].toString(),
+                            style: TextStyle(
+                              color: Color(0xFFFFFFFF),
+                              fontWeight: FontWeight.w600,
+                              fontSize: 30,
+                            ),
+                          ),
+                          Text(
+                            "@${profileData![2].toString()}",
+                            style: TextStyle(
+                              color: Color(0xFFC9C9C9),
+                              fontWeight: FontWeight.w300,
+                              fontSize: 20,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ]
                 ),
               ),
             ),
           ],
+        ),
+
+        //profile details
+        Container(
+          margin: EdgeInsets.all(10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+
+            children: [
+              Text(
+                "Contact Details",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w300,
+                ),
+              ),
+              Row(
+                children: [
+                  Container(
+                    width: 75,
+                    child: Text(
+                      "Email",
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600
+                      ),
+                    )
+                  ),
+
+                  Text(
+                    profileData![1].toString(),
+                    style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w400,
+                    )
+                  )
+                ]
+              )
+            ],
+          )
         ),
       ],
     );
@@ -152,11 +222,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
               leading: Icon(Icons.logout),
               title: Text("Logout"),
               onTap:() async {
+                ProfileRepository.clearCache();
+
                 await supabase.auth.signOut();
 
                 if (mounted) {
-                  profileData = null;
-                  isLoading = true;
+                  setState(() {
+                    profileData = null;
+                    isLoading = true;
+                  });
                 }
 
                 Navigator.pop(context);
