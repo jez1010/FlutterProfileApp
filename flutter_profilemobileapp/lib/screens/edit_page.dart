@@ -6,7 +6,6 @@ import 'dart:io';
 import '../main.dart';
 
 //localfiles
-import '../functions/supabase_access.dart';
 import '../functions/functions.dart';
 
 void main() {
