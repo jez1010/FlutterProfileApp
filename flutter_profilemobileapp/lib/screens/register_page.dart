@@ -8,6 +8,8 @@ import '../main.dart';
 //localfiles
 import '../functions/supabase_access.dart';
 import '../functions/functions.dart';
+import 'profile_page.dart';
+import 'login_page.dart';
 
 void main() {
   runApp(RegisterPage());
@@ -55,10 +57,49 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
-  final _descController = TextEditingController();
 
-  String? selectedProfile = 'DEFAULT_PROFILE_1';
+  final RegisteringNewUsers _registration = RegisteringNewUsers();
+
+  String selectedProfile = 'DEFAULT_PROFILE_1';
   final List<String> defaults = ['DEFAULT_PROFILE_1', 'DEFAULT_PROFILE_2', 'DEFAULT_PROFILE_3'];
+
+  //registration function
+  String? _errorMessage;
+  bool _isLoading = false;
+  Future<String?> _handleRegister() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    final result = await _registration.signUpNewUser(
+      _emailController.text.trim(),
+      _passwordController.text.trim(),
+      _usernameController.text.trim(),
+      _firstNameController.text.trim(),
+      _lastNameController.text.trim(),
+      selectedProfile,
+    );
+
+    if (!mounted) return null;
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    return result;
+  }
+
+  //removing form contents
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _usernameController.dispose();
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    super.dispose();
+  }
 
   //the actual page content
   @override
@@ -207,6 +248,33 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         return null;
                       },
                     ),
+                    Container(
+                      margin: EdgeInsets.only(top: 5),
+                      alignment: Alignment.centerLeft,
+                      child: Row (
+                        children: [
+
+                          Checkbox(
+                            value: _firstField, 
+                            onChanged: (bool? value) {
+                              setState(() {
+                                _firstField = !_firstField;
+                              });
+                            },
+                            visualDensity: const VisualDensity(
+                              horizontal: VisualDensity.minimumDensity,
+                              vertical: VisualDensity.minimumDensity,
+                            ),
+                          ),
+
+                          SizedBox(
+                            width: 5,
+                          ),
+
+                          Text("Reveal password"),
+                        ]
+                      )
+                    ),
 
                     Container(
                       margin: EdgeInsets.only(top: 10),
@@ -252,7 +320,33 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         return null;
                       },
                     ),
+                    Container(
+                      margin: EdgeInsets.only(top: 5),
+                      alignment: Alignment.centerLeft,
+                      child: Row (
+                        children: [
 
+                          Checkbox(
+                            value: _secondField, 
+                            onChanged: (bool? value) {
+                              setState(() {
+                                _secondField = !_secondField;
+                              });
+                            },
+                            visualDensity: const VisualDensity(
+                              horizontal: VisualDensity.minimumDensity,
+                              vertical: VisualDensity.minimumDensity,
+                            ),
+                          ),
+
+                          SizedBox(
+                            width: 5,
+                          ),
+
+                          Text("Reveal password"),
+                        ]
+                      )
+                    ),
 
                     SizedBox(height: 20),
 
@@ -482,10 +576,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         );
                       }).toList(),
                       
-                      onChanged: (newValue) {
-                        setState(() {
-                          selectedProfile = newValue;
-                        });
+                      onChanged: (String? newValue) {
+                        if (newValue != null){
+                          setState(() {
+                            selectedProfile = newValue;
+                          });
+                        }
                       },
                     ),
                     Container(
@@ -512,7 +608,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
               width: double.infinity,
               height: 50,
 
-              margin: EdgeInsets.all(10),
+              margin: EdgeInsets.only(
+                top: 10,
+                right: 10,
+                left: 10,
+              ),
               child: TextButton(
                 style: TextButton.styleFrom(
 
@@ -530,12 +630,104 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
                 ),
 
-                child: Text("Submit"),
-                onPressed: () {
-                  _registerForm.currentState!.validate();
+                child: _isLoading
+                ? SizedBox(
+                  height: 20,
+                  width: 20,
+                  child: CircularProgressIndicator(
+                    color: Color(0xFFFFFFFF),
+                    strokeWidth: 2,
+                  )
+                )
+                : Text("Submit"),
+                onPressed: () async {
+                  if (_registerForm.currentState!.validate()) {
+                    print(
+                      "email: " + _emailController.text.trim() + ", " + 
+                      "password: " + _passwordController.text.trim() + ", " +
+                      "username: " + _usernameController.text.trim() + ", " +
+                      "first name: " + _firstNameController.text.trim() + ", " +
+                      "last name: " + _lastNameController.text.trim() + ", " +
+                      "selected profile: " + selectedProfile
+                    );
+
+                    final result = await _handleRegister();
+                    print("thing: $result");
+
+                    if (!mounted) return;
+
+                    if (result == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text("Successfully registered"),
+                          backgroundColor: const Color(0xFF78FF78),
+                        )
+                      );
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const ProfilePage()),
+                      );
+                    }
+                    if (result != null ) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            switch (result) {
+                              'user_already_exists' => 'This email is already registered. Try logging in!',
+                              'invalid_credentials' => 'Incorrect email or password.',
+                              'signup_disabled'     => 'Signups are currently closed.',
+                              'network_error'       => 'Check your internet connection and try again.',
+                              'weak_password'       => 'That password is too easy to guess!',
+                              _ => 'An unexpected error occurred (Code: $result)',
+                            }
+                          ),
+                          backgroundColor: const Color(0xFFFF0000),
+                        )
+                      );
+                    }
+                  }
                 },
               ),
+            ),
+
+            Container(
+              width: double.infinity,
+              height: 50,
+
+              margin: EdgeInsets.only(
+                top: 10,
+                right: 10,
+                left: 10,
+              ),
+              child: TextButton(
+                style: TextButton.styleFrom(
+
+                  backgroundColor: Color(0xFFACACAC),
+
+                  foregroundColor: Color(0xFF000000),
+
+                  textStyle: TextStyle(
+                    fontSize: 16.0,
+                    fontFamily: 'IBMPlexSans',
+                    fontWeight: FontWeight.w300,
+                  ),
+
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                ),
+
+                child: Text("Return to Login Screen"),
+                onPressed: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const LoginPage()),
+                      );
+                }
+              ),
             )
+
+
           ],
         ),
       ),

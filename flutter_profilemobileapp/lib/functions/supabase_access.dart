@@ -1,3 +1,5 @@
+import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../main.dart';
 
 //grab current user
@@ -12,34 +14,32 @@ String getUser(){
 
 //register a new user
 class RegisteringNewUsers {
-  Future<void> signUpNewUser(
+  Future<String?> signUpNewUser(
     String email,
+    String password,
     String username, //varchar
     String firstName,//varchar
     String lastName, //varchar
-    String socialMedia, //jsonb
-    String description, //text
-    String password,
+    String profilePicture,
   ) async {
     try {
-      final authResponse = await supabase.auth.signUp(
+      await supabase.auth.signUp(
         email: email,
         password: password,
-      );
-
-      final String? userId = authResponse.user?.id;
-
-      if (userId != null){
-        await supabase.from('PROFILES').insert({
-          'user_id': userId,
+        data: {
           'username': username,
           'first_name': firstName,
           'last_name': lastName,
-          'description': description,
-        });
-      }
+          'photo_link': profilePicture,
+        }
+      );
+
+      return null;
+    } on AuthException catch (e) {
+      return e.code ?? e.message;
     } catch (e) {
-      print("Registration failed: $e");
+      print("$e");
+      return(e.toString());
     }
   }
 }

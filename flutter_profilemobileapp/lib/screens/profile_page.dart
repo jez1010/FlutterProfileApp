@@ -1,5 +1,6 @@
 //dart-flutter libraries
 import 'package:flutter/material.dart';
+import 'package:flutter_profilemobileapp/main.dart';
 
 //local files
 import 'login_page.dart';
@@ -93,9 +94,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   shape: BoxShape.circle,
                   color: Color(0xFFFFFFFF),
                   image: DecorationImage(
-                    image: profileData![5].toString() != "DEFAULT_PROFILE"
+                    image: !profileData![5].toString().startsWith("DEFAULT_PROFILE_")
                       ? NetworkImage(profileData![5].toString())
-                      : NetworkImage('https://mmudgmsuskxpcbinqrpu.supabase.co/storage/v1/object/public/ProfileImages/default_profile.jpg'),
+                      : AssetImage('assets/images/defaults/${profileData![5].toString()}.png'),
                     fit: BoxFit.cover,
                   )
                 ),
@@ -151,10 +152,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
               leading: Icon(Icons.logout),
               title: Text("Logout"),
               onTap:() async {
+                await supabase.auth.signOut();
+
+                if (mounted) {
+                  profileData = null;
+                  isLoading = true;
+                }
+
                 Navigator.pop(context);
-                Navigator.push(
+
+                Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(builder: (context) => const LoginPage())
+                  MaterialPageRoute(builder: (context) => const LoginPage()),
+                  (route) => false,
                 );
               },
             )
