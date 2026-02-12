@@ -1,7 +1,8 @@
 //dart-flutter libraries
 import 'package:flutter/material.dart';
 import 'package:flutter_profilemobileapp/main.dart';
-import 'dart:convert';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 //local files
 import 'login_page.dart';
@@ -51,6 +52,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   final ProfileRepository _repository = ProfileRepository();
 
+  var defaultLinks = ["LinkedIn", "Github", "Facebook"];
+
   Future<void> _loadProfile() async {
     await Future.delayed(Duration(milliseconds: 500));
     final data = await _repository.getProfileDetails();
@@ -61,6 +64,118 @@ class _ProfileScreenState extends State<ProfileScreen> {
         isLoading = false;
       });
     }
+  }
+
+  Future<void> _launchURL(String urlString) async {
+    final Uri url = Uri.parse(urlString);
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      throw Exception('Could not launch $url');
+    }
+  }
+
+  Widget _contactFields() {
+    var mappedContacts = Map<String, String>.from(profileData![4] as Map);
+
+    return Column(
+      children: [
+        if (mappedContacts.isEmpty)
+          Text("User has yet to add socials."),
+
+        for (String key in defaultLinks)
+          if (mappedContacts.containsKey(key))
+            _buildRow(key, mappedContacts[key]!, isDefault: true),
+
+        for (var entry in mappedContacts.entries)
+          if (!defaultLinks.contains(entry.key))
+            _buildRow(entry.key, entry.value, isDefault: false),
+      ],
+    );
+  }
+
+  Widget _buildRow(String key, String value, {required bool isDefault}) {
+    return InkWell(
+      onTap: () => _launchURL(value),
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        height: 30,
+
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(width: 0.5, color: Color(0xFF8D8D8D))
+          )
+        ),
+
+        child: Row(
+          children: [
+            Container(
+              width: 22, // Increased for icon safety
+              alignment: Alignment.centerLeft,
+              child: isDefault 
+                ? switch (key) {
+                    "Github" => const FaIcon(FontAwesomeIcons.github, size: 15),
+                    "Facebook" => const FaIcon(FontAwesomeIcons.facebook, size: 15),
+                    "LinkedIn" => const FaIcon(FontAwesomeIcons.linkedin, size: 15),
+                    _ => const Icon(Icons.link, size: 15,),
+                  }
+                : const Icon(Icons.link, size: 15),
+            ),
+
+            SizedBox(
+              width: 75,
+              child: Text(
+                isDefault ? key[0].toUpperCase() + key.substring(1) : key,
+                style: const TextStyle(
+                  fontSize: 15, 
+                  fontWeight: FontWeight.w400
+                ),
+              ),
+            ),
+
+            Spacer(),
+
+            Icon(
+              Icons.arrow_outward_sharp,
+              size: 15,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTags() {
+    List<String> tagList = _repository.parseTags(profileData![7]);
+    return Wrap(
+      spacing: 5, 
+      runSpacing: 5, 
+      children: [
+        for (String tag in tagList)
+          Container(
+            height: 20,
+            padding: EdgeInsets.only(
+              top: 2,
+              bottom: 2,
+              left: 10, 
+              right: 10,
+            ),
+            
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: Color(0xFF8D8D8D)
+              )
+            ),
+
+            child: Text(
+              tag,
+              style: TextStyle(
+                fontWeight: FontWeight.w400,
+                fontSize: 10,
+              ),
+            ),
+          )
+      ],
+    );
   }
 
   Widget _pageContents() {
@@ -117,31 +232,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       width: 10,
                     ),
 
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            profileData![3].toString().isEmpty
-                            ? profileData![2].toString()
-                            : profileData![3].toString(),
-                            style: TextStyle(
-                              color: Color(0xFFFFFFFF),
-                              fontWeight: FontWeight.w600,
-                              fontSize: 30,
+                    Expanded(
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              profileData![3].toString().isEmpty
+                              ? profileData![2].toString()
+                              : profileData![3].toString(),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: TextStyle(
+                                color: Color(0xFFFFFFFF),
+                                fontWeight: FontWeight.w600,
+                                fontSize: 25,
+                              ),
                             ),
-                          ),
-                          Text(
-                            "@${profileData![2].toString()}",
-                            style: TextStyle(
-                              color: Color(0xFFC9C9C9),
-                              fontWeight: FontWeight.w300,
-                              fontSize: 20,
+
+                            Text(
+                              "@${profileData![2].toString()}",
+                              style: TextStyle(
+                                color: Color(0xFFC9C9C9),
+                                fontWeight: FontWeight.w300,
+                                fontSize: 15,
+                              ),
                             ),
-                          ),
-                        ],
+
+                          ],
+                        ),
                       ),
                     ),
                   ]
@@ -150,10 +271,74 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ],
         ),
-
-        //profile details
+        
+        //description
         Container(
-          margin: EdgeInsets.all(10),
+          margin: EdgeInsets.only(
+            top: 10,
+            left: 20,
+            right: 20,
+            bottom: 5,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+
+            children: [
+              Text(
+                "About Me",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w300,
+                ),
+              ),
+
+              Container(
+                width: double.infinity,
+
+                padding: EdgeInsets.all(10),
+
+                decoration: BoxDecoration(
+                  color: Color(0xFFE0E0E0),
+                ),
+
+                child: Text(profileData![5]),
+              ),
+            ]
+          ),
+        ),
+
+        //tags
+        Container(
+          margin: EdgeInsets.only(
+            top: 10,
+            left: 20,
+            right: 20,
+            bottom: 5,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Tags",
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w300,
+                ),
+              ),
+              SizedBox(height: 5),
+              _buildTags(),
+            ],
+          )
+        ),
+
+        //contacts
+        Container(
+          margin: EdgeInsets.only(
+            top: 10,
+            left: 20,
+            right: 20,
+            bottom: 5,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
 
@@ -165,34 +350,87 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   fontWeight: FontWeight.w300,
                 ),
               ),
-              Row(
-                children: [
-                  Container(
-                    width: 75,
-                    child: Text(
-                      "Email",
+
+              SizedBox(height: 10),
+
+              Container(
+                padding: EdgeInsets.all(10),
+
+                decoration: BoxDecoration(
+                  color: Color(0xFFE0E0E0),
+                ),
+
+                child: Row(
+                  children: [
+                    Container(
+                      width: 22,
+
+                      alignment: Alignment.centerLeft,
+                      child: Icon(
+                        Icons.email,
+                        size: 15,
+                      ),
+                    ),
+
+                    SizedBox(
+                      width: 50,
+                      child: Text(
+                        "Email",
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500
+                        ),
+                      )
+                    ),
+
+                    Text(
+                      profileData![1].toString(),
+                      style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w400,
+                      )
+                    )
+                  ]
+                ),
+              ),
+
+              SizedBox(height: 5),
+
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.all(10),
+
+                decoration: BoxDecoration(
+                  color: Color(0xFFE0E0E0),
+                ),
+
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children:[
+                    Text(
+                      "Socials",
                       style: TextStyle(
                         fontSize: 15,
-                        fontWeight: FontWeight.w600
+                        fontWeight: FontWeight.w500,
                       ),
-                    )
-                  ),
+                    ),
 
-                  Text(
-                    profileData![1].toString(),
-                    style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w400,
-                    )
-                  )
-                ]
-              )
+                    _contactFields(),
+                  ],
+                )
+              ),
+
+              //free space
+
+
+
             ],
           )
         ),
       ],
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
