@@ -88,11 +88,14 @@ class ProfileRepository {
       response['description'],
       response['photo_link'],
       response['tags'],
+      response['extra_details'],
     ];
 
     _cachedProfile = details;
     return _cachedProfile!;
   }
+
+  static void clearCache() => _cachedProfile = null;
 
   List<String> parseTags(String tagString) {
     List<String> tags = tagString.split(',');
@@ -104,5 +107,10 @@ class ProfileRepository {
     return tags;
   }
 
-  static void clearCache() => _cachedProfile = null;
+  Map<String, dynamic> parseSchool(Map<String, dynamic> decodedJson) {
+    if(decodedJson.containsKey('education') && decodedJson['education'] is Map) {
+      return decodedJson['education'] as Map<String, dynamic>;
+    }
+    return {};
+  }
 }

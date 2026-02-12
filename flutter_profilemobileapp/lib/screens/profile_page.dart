@@ -54,6 +54,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   var defaultLinks = ["LinkedIn", "Github", "Facebook"];
 
+  Widget buildEachSchool(Map<String, dynamic> eduMap, String category){
+    if (!eduMap.containsKey(category) || eduMap[category] is! List) {
+        return Text("No data available for this category");
+      }
+
+    List<dynamic> list = eduMap[category];
+
+    for (Map<String, dynamic> school in list) {
+    };
+    return Text("Test");
+  }
+
   Future<void> _loadProfile() async {
     await Future.delayed(Duration(milliseconds: 500));
     final data = await _repository.getProfileDetails();
@@ -177,6 +189,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ],
     );
   }
+
+
 
   Widget _pageContents() {
     print("Response from profile_page: ${profileData.toString()}");
@@ -432,6 +446,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
 
+  //actual build area
   @override
   Widget build(BuildContext context) {
     return Scaffold(
