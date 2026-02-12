@@ -3,13 +3,6 @@ import 'dart:convert';
 
 import '../main.dart';
 
-class jsonConversion {
-  Map<String,String> convertString(String jsonString) {
-    Map<String, String> mappedValues = jsonDecode(jsonString);
-    return mappedValues;
-  }
-}
-
 //grab current user
 String getUser(){
   final user = supabase.auth.currentUser;
@@ -93,11 +86,22 @@ class ProfileRepository {
       names,
       response['social_media'],
       response['description'],
-      response['photo_link']
+      response['photo_link'],
+      response['tags'],
     ];
 
     _cachedProfile = details;
     return _cachedProfile!;
+  }
+
+  List<String> parseTags(String tagString) {
+    List<String> tags = tagString.split(',');
+
+    for (int i = 0; i <tags.length; i++) {
+      tags[i] = tags[i].trim();
+    }
+
+    return tags;
   }
 
   static void clearCache() => _cachedProfile = null;

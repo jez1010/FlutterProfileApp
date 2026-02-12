@@ -1,9 +1,5 @@
 //dart-flutter libraries
 import 'package:flutter/material.dart';
-import 'dart:io';
-
-//main file
-import '../main.dart';
 
 //localfiles
 import '../functions/functions.dart';
@@ -63,12 +59,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final List<String> defaults = ['DEFAULT_PROFILE_1', 'DEFAULT_PROFILE_2', 'DEFAULT_PROFILE_3'];
 
   //registration function
-  String? _errorMessage;
   bool _isLoading = false;
   Future<String?> _handleRegister() async {
     setState(() {
       _isLoading = true;
-      _errorMessage = null;
     });
 
     final result = await _registration.signUpNewUser(
@@ -380,6 +374,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     TextFormField(
                       controller: _usernameController,
+                      maxLength: 15,
                       decoration: InputDecoration(
                         hintText: 'Enter username here.',
                         contentPadding: EdgeInsets.symmetric(horizontal: 2),
@@ -702,7 +697,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               child: TextButton(
                 style: TextButton.styleFrom(
 
-                  backgroundColor: Color(0xFFACACAC),
+                  backgroundColor: Color(0xFFEEEEEE),
 
                   foregroundColor: Color(0xFF000000),
 
