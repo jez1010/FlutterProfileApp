@@ -53,17 +53,36 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final ProfileRepository _repository = ProfileRepository();
 
   var defaultLinks = ["LinkedIn", "Github", "Facebook"];
+  
 
-  Widget buildEachSchool(Map<String, dynamic> eduMap, String category){
+  
+  List<Widget> _buildEducationWidgets(Map<String, dynamic> eduMap, String category) {
     if (!eduMap.containsKey(category) || eduMap[category] is! List) {
-        return Text("No data available for this category");
-      }
+      return [const Text("No data available for this category")];
+    }
 
     List<dynamic> list = eduMap[category];
 
-    for (Map<String, dynamic> school in list) {
-    };
-    return Text("Test");
+    return list.map((item) {
+      var school = item as Map<String, dynamic>;
+      
+      String displayContent = "${school['name'] ?? 'Unknown School'}";
+      
+      if (school.containsKey('course')) displayContent += "\n${school['course']}";
+      if (school.containsKey('level'))  displayContent += " - ${school['level']}";
+      
+      if (school.containsKey('year_start')) {
+        displayContent += "\n${school['year_start']} - ${school['year_end'] ?? 'Present'}";
+      }
+
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: Text(
+          displayContent,
+          style: const TextStyle(fontSize: 14, height: 1.4),
+        ),
+      );
+    }).toList();
   }
 
   Future<void> _loadProfile() async {
