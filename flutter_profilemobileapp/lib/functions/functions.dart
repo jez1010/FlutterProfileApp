@@ -1,7 +1,9 @@
+import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'dart:convert';
 
 import '../main.dart';
+import '../screens/login_page.dart';
+import '../screens/edit_page.dart';
 
 //grab current user
 String getUser(){
@@ -45,10 +47,13 @@ class RegisteringNewUsers {
   }
 }
 
-
 //grab profile and store it on local
 class ProfileRepository {
   static List<dynamic>? _cachedProfile;
+
+  List<dynamic>? retrieveProfile() {
+    return _cachedProfile;
+  }
 
   Future<List<dynamic>> getProfileDetails() async{
     final userId = supabase.auth.currentUser?.id;
@@ -67,16 +72,16 @@ class ProfileRepository {
 
     if (response == null) {
       print("No profile found for user: $userId");
-      return [userId, "DEfault Username", "Default Name", "Default Social Media", "Default Description", "Default Photo URL"];
+      return [userId, "Default Username", "Default Name", "Default Social Media", "Default Description", "Default Photo URL"];
     }
 
     String name1 = response['first_name'] ?? "";
     String name2 = response['last_name'] ?? "";
     String names = "";
     if (name1.isNotEmpty || name2.isNotEmpty) {
-      names = "$name1 $name2";
+      names = "$name1|$name2";
     } else {
-      names = name1.isNotEmpty ? name1 : name2;
+      names = name1.isNotEmpty ? "$name1|" : "|$name2";
     }
     
     final List<dynamic> details = [
@@ -113,4 +118,47 @@ class ProfileRepository {
     }
     return {};
   }
+}
+
+Widget standardDrawer(BuildContext context) {
+  return Drawer(
+    child: ListView(
+      padding: EdgeInsets.zero,
+      children: [
+        ListTile(
+          leading: Icon(Icons.settings),
+          title: Text("Edit profile"),
+          onTap: () async {
+            Navigator.pop(context);
+
+            if(context.mounted){
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => EditPage())
+              );
+            }
+          },
+        ),
+        ListTile(
+          leading: Icon(Icons.logout),
+          title: Text("Logout"),
+          onTap: () async {
+            ProfileRepository.clearCache();
+
+            await supabase.auth.signOut();
+
+            Navigator.pop(context);
+
+            if (context.mounted) {
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => const LoginPage()),
+                (route) => false,
+              );
+            }
+          },
+        ),
+      ],
+    ),
+  );
 }
