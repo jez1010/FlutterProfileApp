@@ -376,6 +376,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       controller: _usernameController,
                       maxLength: 15,
                       decoration: InputDecoration(
+                        counterText: "",
                         hintText: 'Enter username here.',
                         contentPadding: EdgeInsets.symmetric(horizontal: 2),
                         filled: true,

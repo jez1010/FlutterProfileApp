@@ -7,13 +7,14 @@ import '../main.dart';
 
 //localfiles
 import '../functions/functions.dart';
+import 'profile_page.dart';
 
 void main() {
-  runApp(RegisterPage());
+  runApp(EditPage());
 }
 
-class RegisterPage extends StatelessWidget {
-  const RegisterPage({super.key});
+class EditPage extends StatelessWidget {
+  const EditPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -24,37 +25,103 @@ class RegisterPage extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Color(0xFF686868)),
         fontFamily: 'IBMPlexSans',
       ),
-      home: const RegisterScreen(title: 'Flutter Demo Home Page'),
+      home: const EditScreen(title: 'Flutter Demo Home Page'),
     );
   }
 }
 
-class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key, required this.title});
+class EditScreen extends StatefulWidget {
+  const EditScreen({super.key, required this.title});
 
   final String title;
 
   @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
+  State<EditScreen> createState() => _EditScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class _EditScreenState extends State<EditScreen> {
   //variables
 
   //text fields
-  final _registerForm = GlobalKey<FormState>();
+  final _EditForm = GlobalKey<FormState>();
 
-  final _emailController = TextEditingController();
   final _usernameController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
 
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
   final _descController = TextEditingController();
+  final _tagsController = TextEditingController();
 
   String? selectedProfile = 'DEFAULT_PROFILE_1';
   final List<String> defaults = ['DEFAULT_PROFILE_1', 'DEFAULT_PROFILE_2', 'DEFAULT_PROFILE_3'];
+
+  List<TextEditingController> _socialsController = [];
+
+  final ProfileRepository _repository = ProfileRepository();
+  List<dynamic>? profileData;
+
+  void loadExistingTags(List<dynamic>? profileData) {
+    _usernameController.text = profileData![2] ?? "";
+    _firstNameController.text = profileData[3].split("|")[0];
+    _lastNameController.text = profileData[3].split("|")[1];
+    _descController.text = profileData[5] ?? "";
+    _tagsController.text = profileData[7] ?? "";
+  }
+
+
+
+  @override
+  void initState() {
+    super.initState();
+
+    print("Test: ${_repository.retrieveProfile()}");
+
+    profileData = _repository.retrieveProfile();
+    
+    if (profileData != null) {
+      loadExistingTags(profileData);
+    }
+  }
+
+  Widget _buildTags() {
+    if (_tagsController.text == null || _tagsController.text == "") {
+      return const Text("User has yet to add tags.");
+    }
+
+    List<String> tagList = _repository.parseTags(_tagsController.text);
+    return Wrap(
+      spacing: 5, 
+      runSpacing: 5, 
+      children: [
+        for (String tag in tagList)
+          if (tag != "") 
+            Container(
+              height: 20,
+              padding: EdgeInsets.only(
+                top: 2,
+                bottom: 2,
+                left: 10, 
+                right: 10,
+              ),
+              
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: Color(0xFF8D8D8D)
+                )
+              ),
+
+              child: Text(
+                tag,
+                style: TextStyle(
+                  fontWeight: FontWeight.w400,
+                  fontSize: 10,
+                ),
+              ),
+            )
+      ],
+    );
+  }
 
   //the actual page content
   @override
@@ -62,7 +129,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          "Registration",
+          "Profile",
           style: TextStyle(color: Color(0xFFFFFFFF)),
         ),
 
@@ -79,30 +146,54 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
       ),
 
+      drawer: standardDrawer(context),
+
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Container(
-              margin: EdgeInsets.only(top: 20, bottom: 10, left: 10, right: 10),
-              alignment: Alignment.centerLeft,
-              child: Text(
-                "Sign up for Compass",
-                style: TextStyle(fontSize: 30, fontWeight: FontWeight.w400),
-              ),
-            ),
+              GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
 
-            //the registration form
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) =>ProfilePage())
+                  );
+                },
+                child: Container( 
+                  margin: EdgeInsets.only(
+                    top: 20, 
+                    bottom: 10, 
+                    left: 10, 
+                    right: 10
+                  ),
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        width: 15,
+                        child: Icon(Icons.arrow_back_ios, size: 10)
+                      ),
+                      Text(
+                        "Return to profile",
+                      )
+                    ]
+                  )
+                )
+              ),
+
+            //the editing form
             Container(
               margin: EdgeInsets.all(10),
               child: Form(
-                key: _registerForm,
+                key: _EditForm,
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
                       margin: EdgeInsets.only(top: 10, bottom: 10),
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        "Account Setup",
+                        "Profile Card",
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w300,
@@ -111,48 +202,95 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
 
                     Container(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        "Email",
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w400,
-                        ),
+                      padding: EdgeInsets.all(10),
+                      child: Stack(
+                        alignment: Alignment.center,
+
+                        children: [
+                          Container(
+                            width: double.infinity,
+                            height: 150,
+
+                            padding: EdgeInsets.only(
+                              top: 20,
+                              left: 10,
+                              right: 10,
+                              bottom: 20,
+                            ),
+
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+
+                                colors: [Color(0xFF2D27D7), Color(0xFF191755)],
+                              ),
+                            ),
+
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 125,
+                                    height: 125,
+
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Color(0xFFFFFFFF),
+                                      image: DecorationImage(
+                                        image:
+                                          AssetImage('assets/images/defaults/$selectedProfile.png'),
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ),
+
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+
+                                  Expanded(
+                                    child: Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "${_firstNameController.text}${_lastNameController.text}".isEmpty
+                                            ? _usernameController.text
+                                            : "${_firstNameController.text} ${_lastNameController.text}",
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 1,
+                                            style: TextStyle(
+                                              color: Color(0xFFFFFFFF),
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 25,
+                                            ),
+                                          ),
+
+                                          Text(
+                                            "@${_usernameController.text.trim()}",
+                                            style: TextStyle(
+                                              color: Color(0xFFC9C9C9),
+                                              fontWeight: FontWeight.w300,
+                                              fontSize: 15,
+                                            ),
+                                          ),
+
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ]
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    TextFormField(
-                      controller: _emailController,
-                      decoration: InputDecoration(
-                        hintText: 'Enter email here.',
-                        contentPadding: EdgeInsets.symmetric(horizontal: 2),
-                        filled: true,
-                        fillColor: const Color(0xFFEEEEEE),
-
-                        enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(
-                            color: const Color(0xFF8D8D8D),
-                          ),
-                          borderRadius: BorderRadius.zero,
-                        ),
-
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Color(0xFF2D27D7),
-                            width: 2,
-                          ),
-                          borderRadius: BorderRadius.zero,
-                        ),
-                      ),
-                      style: TextStyle(fontSize: 15),
-
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Input required.';
-                        }
-                        return null;
-                      },
-                    ),
-
+                    
                     Container(
                       margin: EdgeInsets.only(top: 10),
                       alignment: Alignment.centerLeft,
@@ -166,7 +304,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     TextFormField(
                       controller: _usernameController,
+                      onChanged: (value) {
+                        setState(() {});
+                      },
+                      maxLength: 15,
                       decoration: InputDecoration(
+                        counterText: "",
                         hintText: 'Enter username here.',
                         contentPadding: EdgeInsets.symmetric(horizontal: 2),
                         filled: true,
@@ -197,116 +340,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       },
                     ),
 
-                    Container(
-                      margin: EdgeInsets.only(top: 10),
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        "Password",
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ),
-                    TextFormField(
-                      controller: _passwordController,
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        hintText: 'Enter password here.',
-                        contentPadding: EdgeInsets.symmetric(horizontal: 2),
-                        filled: true,
-                        fillColor: const Color(0xFFEEEEEE),
-                        enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(
-                            color: const Color(0xFF8D8D8D),
-                          ),
-                          borderRadius: BorderRadius.zero,
-                        ),
-
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Color(0xFF2D27D7),
-                            width: 2,
-                          ),
-                          borderRadius: BorderRadius.zero,
-                        ),
-                      ),
-                      style: TextStyle(fontSize: 15),
-
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Input required.';
-                        }
-                        return null;
-                      },
-                    ),
-
-                    Container(
-                      margin: EdgeInsets.only(top: 10),
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        "Confirm Password",
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ),
-                    TextFormField(
-                      controller: _confirmPasswordController,
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        hintText: 'Reenter previous password here.',
-                        contentPadding: EdgeInsets.symmetric(horizontal: 2),
-                        filled: true,
-                        fillColor: const Color(0xFFEEEEEE),
-
-                        enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(
-                            color: const Color(0xFF8D8D8D),
-                          ),
-                          borderRadius: BorderRadius.zero,
-                        ),
-
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Color(0xFF2D27D7),
-                            width: 2,
-                          ),
-                          borderRadius: BorderRadius.zero,
-                        ),
-                      ),
-                      style: TextStyle(fontSize: 15),
-
-                      validator: (value) {
-                        if (value == null ||
-                            value != _passwordController.text) {
-                          return 'Input required.';
-                        }
-                        return null;
-                      },
-                    ),
-
-                    SizedBox(height: 20),
-
-                    Divider(
-                      color: const Color(0xFF6D6D6D),
-                      thickness: 0.25,
-                      height: 11,
-                    ),
-
-                    Container(
-                      margin: EdgeInsets.only(top: 10, bottom: 10),
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        "Details and Personalization",
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w300,
-                        ),
-                      ),
-                    ),
-
                     Row(
                       children: [
                         Expanded(
@@ -325,6 +358,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               ),
                               TextFormField(
                                 controller: _firstNameController,
+                                onChanged: (value) {
+                                  setState(() {});
+                                },
                                 decoration: InputDecoration(
                                   contentPadding: EdgeInsets.symmetric(
                                     horizontal: 2,
@@ -378,6 +414,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               ),
                               TextFormField(
                                 controller: _lastNameController,
+                                onChanged: (value) {
+                                  setState(() {});
+                                },
                                 decoration: InputDecoration(
                                   contentPadding: EdgeInsets.symmetric(
                                     horizontal: 2,
@@ -544,6 +583,69 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         return null;
                       },
                     ),
+
+                    //tags
+                    SizedBox(
+                      width: double.infinity,
+                
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Tags",
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w300,
+                            ),
+                          ),
+                          SizedBox(height: 5),
+                          _buildTags(),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 5),
+                    TextFormField(
+                      keyboardType: TextInputType.multiline,
+                      minLines: 1,
+                      maxLines: 5,
+                      controller: _tagsController,
+                      onChanged: (value) {
+                        setState(() {});
+                      },
+                      decoration: InputDecoration(
+                        hintText: 'Add tags here..',
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 2,
+                          vertical: 15,
+                        ),
+                        filled: true,
+                        fillColor: const Color(0xFFEEEEEE),
+
+                        enabledBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(
+                            color: const Color(0xFF8D8D8D),
+                          ),
+                          borderRadius: BorderRadius.zero,
+                        ),
+
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Color(0xFF2D27D7),
+                            width: 2,
+                          ),
+                          borderRadius: BorderRadius.zero,
+                        ),
+                      ),
+                      style: TextStyle(fontSize: 15),
+
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Input required.';
+                        }
+                        return null;
+                      },
+                    ),
+
                   ],
                 ),
 

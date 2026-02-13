@@ -1,11 +1,9 @@
 //dart-flutter libraries
 import 'package:flutter/material.dart';
-import 'package:flutter_profilemobileapp/main.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 //local files
-import 'login_page.dart';
 import '../functions/functions.dart';
 
 void main(){
@@ -55,6 +53,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
   var defaultLinks = ["LinkedIn", "Github", "Facebook"];
   
 
+
+  Widget _schoolLists(Map<String, dynamic> eduMap) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+          if (eduMap.containsKey('college') && eduMap['college'] is List && (eduMap['college'] as List).isNotEmpty)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ..._buildEducationWidgets(eduMap,'college'),
+              ]
+            ),
+          if (eduMap.containsKey('highschool') && eduMap['highschool'] is List && (eduMap['highschool'] as List).isNotEmpty)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ..._buildEducationWidgets(eduMap,'highschool'),
+              ]
+            ),
+          if (eduMap.containsKey('elementary') && eduMap['elementary'] is List && (eduMap['elementary'] as List).isNotEmpty)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ..._buildEducationWidgets(eduMap,'elementary'),
+              ]
+            ),
+      ]
+    );
+  }
   
   List<Widget> _buildEducationWidgets(Map<String, dynamic> eduMap, String category) {
     if (!eduMap.containsKey(category) || eduMap[category] is! List) {
@@ -175,36 +202,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildTags() {
+    if (profileData![7] == null) {
+      return const Text("User has yet to add tags.");
+    }
+
     List<String> tagList = _repository.parseTags(profileData![7]);
     return Wrap(
       spacing: 5, 
       runSpacing: 5, 
       children: [
         for (String tag in tagList)
-          Container(
-            height: 20,
-            padding: EdgeInsets.only(
-              top: 2,
-              bottom: 2,
-              left: 10, 
-              right: 10,
-            ),
-            
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                color: Color(0xFF8D8D8D)
-              )
-            ),
-
-            child: Text(
-              tag,
-              style: TextStyle(
-                fontWeight: FontWeight.w400,
-                fontSize: 10,
+          if (tag != "") 
+            Container(
+              height: 20,
+              padding: EdgeInsets.only(
+                top: 2,
+                bottom: 2,
+                left: 10, 
+                right: 10,
               ),
-            ),
-          )
+              
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: Color(0xFF8D8D8D)
+                )
+              ),
+
+              child: Text(
+                tag,
+                style: TextStyle(
+                  fontWeight: FontWeight.w400,
+                  fontSize: 10,
+                ),
+              ),
+            )
       ],
     );
   }
@@ -275,7 +307,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             Text(
                               profileData![3].toString().isEmpty
                               ? profileData![2].toString()
-                              : profileData![3].toString(),
+                              : profileData![3].toString().replaceAll('|', ' '),
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
                               style: TextStyle(
@@ -334,35 +366,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   color: Color(0xFFE0E0E0),
                 ),
 
-                child: Text(profileData![5]),
+                child: Text(profileData![5] ?? "No bio has been added.",),
               ),
             ]
           ),
         ),
 
         //tags
-        Container(
-          margin: EdgeInsets.only(
-            top: 10,
-            left: 20,
-            right: 20,
-            bottom: 5,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Tags",
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w300,
+          Container(
+            margin: EdgeInsets.only(
+              top: 10,
+              left: 20,
+              right: 20,
+              bottom: 5,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Tags",
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w300,
+                  ),
                 ),
-              ),
-              SizedBox(height: 5),
-              _buildTags(),
-            ],
-          )
-        ),
+                SizedBox(height: 5),
+                _buildTags(),
+              ],
+            )
+          ),
 
         //contacts
         Container(
@@ -452,15 +484,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ],
                 )
               ),
-
-              //free space
-
-
-
-            ],
-          )
+            ]
+          ),
         ),
-      ],
+
+        //free space
+        if (profileData![8] != null && _repository.parseSchool(profileData![8]).isNotEmpty)
+          Container(
+            margin: EdgeInsets.only(
+              top: 10, 
+              left: 20, 
+              right: 20, 
+              bottom: 5
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+
+              children: [
+                Text(
+                  "Schools",
+                  style: TextStyle(
+                    fontSize: 20, 
+                    fontWeight: FontWeight.w300),
+                ),
+
+                SizedBox(height: 10),
+
+                _schoolLists(_repository.parseSchool(profileData![8]))
+              ],
+            ),
+          ),
+
+
+      ]
     );
   }
 
@@ -473,7 +529,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       appBar: AppBar(
         title: const Text(
-          "Your Profile",
+          "Profile",
           style: TextStyle(
             color: Color(0xFFFFFFFF)
           ),
@@ -486,37 +542,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         backgroundColor: Colors.transparent,
       ),
 
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            ListTile(
-              leading: Icon(Icons.logout),
-              title: Text("Logout"),
-              onTap:() async {
-                ProfileRepository.clearCache();
-
-                await supabase.auth.signOut();
-
-                if (mounted) {
-                  setState(() {
-                    profileData = null;
-                    isLoading = true;
-                  });
-                }
-
-                Navigator.pop(context);
-
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context) => const LoginPage()),
-                  (route) => false,
-                );
-              },
-            )
-          ]
-        )
-      ),
+      drawer: standardDrawer(context),
 
       body: AnimatedSwitcher(
         duration: Duration(milliseconds: 500),
