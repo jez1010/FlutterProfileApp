@@ -134,7 +134,7 @@ Widget standardDrawer(BuildContext context) {
             if(context.mounted){
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => EditPage())
+                MaterialPageRoute(builder: (context) => EditScreen())
               );
             }
           },
@@ -152,7 +152,7 @@ Widget standardDrawer(BuildContext context) {
             if (context.mounted) {
               Navigator.pushAndRemoveUntil(
                 context,
-                MaterialPageRoute(builder: (context) => const LoginPage()),
+                MaterialPageRoute(builder: (context) => const LoginScreen()),
                 (route) => false,
               );
             }
@@ -161,4 +161,102 @@ Widget standardDrawer(BuildContext context) {
       ],
     ),
   );
+}
+
+class EditPageForms {
+  final defaultLinks = ["LinkedIn", "Github", "Facebook"];
+
+  Widget buildSocial(TextEditingController key, TextEditingController value,) {
+    return Row(
+      children: [
+        Expanded(
+          flex: 1,
+          child: Column(
+            children: [
+              Container(
+                margin: EdgeInsets.only(top: 10),
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Social Media",
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400),
+                ),
+              ),
+              TextFormField(
+                controller: key,
+                decoration: InputDecoration(
+                  contentPadding: EdgeInsets.symmetric(horizontal: 2),
+                  filled: true,
+                  fillColor: const Color(0xFFEEEEEE),
+
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: const Color(0xFF8D8D8D)),
+                    borderRadius: BorderRadius.zero,
+                  ),
+
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xFF2D27D7), width: 2),
+                    borderRadius: BorderRadius.zero,
+                  ),
+                ),
+                style: TextStyle(fontSize: 15),
+
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Input required.';
+                  }
+                  return null;
+                },
+              ),
+            ],
+          ),
+        ),
+
+        SizedBox(width: 15),
+
+        Expanded(
+          flex: 2,
+          child: Column(
+            children: [
+              Container(
+                margin: EdgeInsets.only(top: 10),
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "URL",
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400),
+                ),
+              ),
+              TextFormField(
+                controller: value,
+                decoration: InputDecoration(
+                  contentPadding: EdgeInsets.symmetric(horizontal: 2),
+                  filled: true,
+                  fillColor: const Color(0xFFEEEEEE),
+
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: const Color(0xFF8D8D8D)),
+                    borderRadius: BorderRadius.zero,
+                  ),
+
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xFF2D27D7), width: 2),
+                    borderRadius: BorderRadius.zero,
+                  ),
+                ),
+                style: TextStyle(fontSize: 15),
+
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Input required.';
+                  }
+                  return null;
+                },
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+
 }

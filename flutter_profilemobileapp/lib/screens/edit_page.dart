@@ -1,49 +1,32 @@
 //dart-flutter libraries
 import 'package:flutter/material.dart';
-import 'dart:io';
+import 'package:flutter_profilemobileapp/screens/socials_editing.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 //main file
-import '../main.dart';
 
 //localfiles
 import '../functions/functions.dart';
 import 'profile_page.dart';
 
-void main() {
-  runApp(EditPage());
-}
-
-class EditPage extends StatelessWidget {
-  const EditPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Color(0xFF686868)),
-        fontFamily: 'IBMPlexSans',
-      ),
-      home: const EditScreen(title: 'Flutter Demo Home Page'),
-    );
-  }
-}
 
 class EditScreen extends StatefulWidget {
-  const EditScreen({super.key, required this.title});
-
-  final String title;
+  const EditScreen({super.key});
 
   @override
   State<EditScreen> createState() => _EditScreenState();
+}
+
+class SocialsStorage {
+  static Map<String, dynamic> socialsData = {};
 }
 
 class _EditScreenState extends State<EditScreen> {
   //variables
 
   //text fields
-  final _EditForm = GlobalKey<FormState>();
+  final _editForm = GlobalKey<FormState>();
 
   final _usernameController = TextEditingController();
 
@@ -55,20 +38,29 @@ class _EditScreenState extends State<EditScreen> {
   String? selectedProfile = 'DEFAULT_PROFILE_1';
   final List<String> defaults = ['DEFAULT_PROFILE_1', 'DEFAULT_PROFILE_2', 'DEFAULT_PROFILE_3'];
 
-  List<TextEditingController> _socialsController = [];
+  Map<String, TextEditingController> templateControllers = {
+    "key": TextEditingController(),
+    "value": TextEditingController(),
+  };
 
   final ProfileRepository _repository = ProfileRepository();
   List<dynamic>? profileData;
+  List<dynamic>? updatedProfileData;
+
+  var defaultLinks = ["LinkedIn", "Github", "Facebook"];
+
+
 
   void loadExistingTags(List<dynamic>? profileData) {
     _usernameController.text = profileData![2] ?? "";
-    _firstNameController.text = profileData[3].split("|")[0];
-    _lastNameController.text = profileData[3].split("|")[1];
+    _firstNameController.text = profileData[3].split("|")[0] ?? "";
+    _lastNameController.text = profileData[3].split("|")[1] ?? "";
+    SocialsStorage.socialsData = profileData[4] != null
+      ? Map<String, dynamic>.from(profileData[4])
+      : {};
     _descController.text = profileData[5] ?? "";
     _tagsController.text = profileData[7] ?? "";
   }
-
-
 
   @override
   void initState() {
@@ -83,8 +75,100 @@ class _EditScreenState extends State<EditScreen> {
     }
   }
 
+  List<dynamic>? grabEverything() {
+    
+    return [
+      _usernameController.text.trim,
+      _firstNameController.text.trim,
+      _lastNameController.text.trim,
+      _tagsController.text.trim,
+      _descController.text.trim,
+      SocialsStorage.socialsData
+    ];
+  }
+
+  void _launchURL(String urlString) async {
+    final Uri? url = Uri.tryParse(urlString);
+    
+    if (url != null && await canLaunchUrl(url)) {
+      await launchUrl(url);
+    } else {
+      print("Could not launch $urlString");
+    }
+  }
+
+  Widget _contactFields() {
+    var mappedContacts = Map<String, String>.from(SocialsStorage.socialsData);
+
+    return Column(
+      children: [
+        if (mappedContacts.isEmpty)
+          Text("User has yet to add socials."),
+
+        for (String key in defaultLinks)
+          if (mappedContacts.containsKey(key))
+            _buildContact(key, mappedContacts[key]!, isDefault: true),
+
+        for (var entry in mappedContacts.entries)
+          if (!defaultLinks.contains(entry.key))
+            _buildContact(entry.key, entry.value, isDefault: false),
+      ],
+    );
+  }
+
+  Widget _buildContact(String key, String value, {required bool isDefault}) {
+    return InkWell(
+      onTap: () => _launchURL(value),
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        height: 30,
+
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(width: 0.5, color: Color(0xFF8D8D8D))
+          )
+        ),
+
+        child: Row(
+          children: [
+            Container(
+              width: 22, // Increased for icon safety
+              alignment: Alignment.centerLeft,
+              child: isDefault 
+                ? switch (key) {
+                    "Github" => const FaIcon(FontAwesomeIcons.github, size: 15),
+                    "Facebook" => const FaIcon(FontAwesomeIcons.facebook, size: 15),
+                    "LinkedIn" => const FaIcon(FontAwesomeIcons.linkedin, size: 15),
+                    _ => const Icon(Icons.link, size: 15,),
+                  }
+                : const Icon(Icons.link, size: 15),
+            ),
+
+            SizedBox(
+              width: 75,
+              child: Text(
+                isDefault ? key[0].toUpperCase() + key.substring(1) : key,
+                style: const TextStyle(
+                  fontSize: 15, 
+                  fontWeight: FontWeight.w400
+                ),
+              ),
+            ),
+
+            Spacer(),
+
+            Icon(
+              Icons.arrow_outward_sharp,
+              size: 15,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildTags() {
-    if (_tagsController.text == null || _tagsController.text == "") {
+    if (_tagsController.text == "") {
       return const Text("User has yet to add tags.");
     }
 
@@ -153,17 +237,14 @@ class _EditScreenState extends State<EditScreen> {
           children: [
               GestureDetector(
                 onTap: () {
-                  Navigator.pop(context);
-
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) =>ProfilePage())
+                    MaterialPageRoute(builder: (context) => ProfileScreen())
                   );
                 },
                 child: Container( 
                   margin: EdgeInsets.only(
                     top: 20, 
-                    bottom: 10, 
                     left: 10, 
                     right: 10
                   ),
@@ -171,10 +252,17 @@ class _EditScreenState extends State<EditScreen> {
                     children: [
                       SizedBox(
                         width: 15,
-                        child: Icon(Icons.arrow_back_ios, size: 10)
+                        child: Icon(
+                          Icons.arrow_back_ios, 
+                          size: 8
+                        )
                       ),
                       Text(
                         "Return to profile",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 10,
+                        )
                       )
                     ]
                   )
@@ -183,14 +271,18 @@ class _EditScreenState extends State<EditScreen> {
 
             //the editing form
             Container(
-              margin: EdgeInsets.all(10),
+              margin: EdgeInsets.only(
+                left: 10,
+                right: 10,
+                bottom: 10,
+              ),
               child: Form(
-                key: _EditForm,
+                key: _editForm,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      margin: EdgeInsets.only(top: 10, bottom: 10),
+                      margin: EdgeInsets.only(top: 10),
                       alignment: Alignment.centerLeft,
                       child: Text(
                         "Profile Card",
@@ -386,9 +478,6 @@ class _EditScreenState extends State<EditScreen> {
                                 style: TextStyle(fontSize: 15),
 
                                 validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Input required.';
-                                  }
                                   return null;
                                 },
                               ),
@@ -442,9 +531,6 @@ class _EditScreenState extends State<EditScreen> {
                                 style: TextStyle(fontSize: 15),
 
                                 validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Input required.';
-                                  }
                                   return null;
                                 },
                               ),
@@ -534,6 +620,26 @@ class _EditScreenState extends State<EditScreen> {
                       ),
                     ),
 
+                    SizedBox(height: 20),
+
+                    Divider(
+                      color: const Color(0xFF6D6D6D),
+                      thickness: 0.25,
+                      height: 11,
+                    ),
+
+                    Container(
+                      margin: EdgeInsets.only(top: 10),
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        "Profile Details",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w300,
+                        ),
+                      ),
+                    ),
+
                     Container(
                       margin: EdgeInsets.only(top: 10),
                       alignment: Alignment.centerLeft,
@@ -577,9 +683,6 @@ class _EditScreenState extends State<EditScreen> {
                       style: TextStyle(fontSize: 15),
 
                       validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Input required.';
-                        }
                         return null;
                       },
                     ),
@@ -594,16 +697,13 @@ class _EditScreenState extends State<EditScreen> {
                           Text(
                             "Tags",
                             style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w300,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w400,
                             ),
                           ),
-                          SizedBox(height: 5),
-                          _buildTags(),
                         ],
                       ),
                     ),
-                    SizedBox(height: 5),
                     TextFormField(
                       keyboardType: TextInputType.multiline,
                       minLines: 1,
@@ -639,18 +739,103 @@ class _EditScreenState extends State<EditScreen> {
                       style: TextStyle(fontSize: 15),
 
                       validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Input required.';
-                        }
                         return null;
                       },
                     ),
+                    Container(
+                      margin: EdgeInsets.only(top: 5),
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        "Separate each tag with a comma. Below is how your tags will look like on your profile.",
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 5),
+                    _buildTags(),
 
+                    //socials
+                    SizedBox(height: 10),
+
+                    SizedBox(
+                      width: double.infinity,
+                
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Socials",
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    SizedBox(
+                      width: double.infinity,
+                      child: TextButton(
+                        style: TextButton.styleFrom(
+                          backgroundColor: Color(0xFFEEEEEE),
+                          disabledForegroundColor: Color(0xFF030231),
+
+                          foregroundColor: Color(0xFF000000),
+
+                          textStyle: TextStyle(
+                            fontSize: 15.0,
+                            fontFamily: 'IBMPlexSans',
+                            fontWeight: FontWeight.w300,
+                          ),
+
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                        ),
+
+                        child: Text("Edit my socials"),
+                        onPressed: () async {
+                          final result = await Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => SocialScreen()),
+                          );
+
+                          if(result == true) {
+                            setState((){});
+                          }
+                        },
+                      ),
+                    ),
+
+                    Text(
+                      "Edit your socials with the button above. Below is how your socials will appear.",
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+
+                    Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.all(10),
+
+                      decoration: BoxDecoration(
+                        color: Color(0xFFE0E0E0),
+                      ),
+
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children:[
+                          _contactFields(),
+                        ],
+                      )
+                    ),
+
+
+                    
                   ],
                 ),
-
-                //socials
-
               ),
             ),
 
@@ -678,7 +863,10 @@ class _EditScreenState extends State<EditScreen> {
                 ),
 
                 child: Text("Submit"),
-                onPressed: () {},
+                onPressed: () {
+                  updatedProfileData = grabEverything();
+                  print("${updatedProfileData}");
+                },
               ),
             )
           ],

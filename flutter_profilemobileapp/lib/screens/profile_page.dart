@@ -6,32 +6,9 @@ import 'package:url_launcher/url_launcher.dart';
 //local files
 import '../functions/functions.dart';
 
-void main(){
-  runApp(ProfilePage());
-}
-
-class ProfilePage extends StatelessWidget {
-  const ProfilePage({super.key});
-  // This widget is the root of your application.
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Color(0xFF686868)),
-        fontFamily: 'IBMPlexSans',
-      ),
-      home: const ProfileScreen(title: 'Flutter Demo Home Page'),
-    );
-  }
-}
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key, required this.title});
-
-  final String title;
+  const ProfileScreen({super.key});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -141,16 +118,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
         for (String key in defaultLinks)
           if (mappedContacts.containsKey(key))
-            _buildRow(key, mappedContacts[key]!, isDefault: true),
+            _buildContact(key, mappedContacts[key]!, isDefault: true),
 
         for (var entry in mappedContacts.entries)
           if (!defaultLinks.contains(entry.key))
-            _buildRow(entry.key, entry.value, isDefault: false),
+            _buildContact(entry.key, entry.value, isDefault: false),
       ],
     );
   }
 
-  Widget _buildRow(String key, String value, {required bool isDefault}) {
+  Widget _buildContact(String key, String value, {required bool isDefault}) {
     return InkWell(
       onTap: () => _launchURL(value),
       borderRadius: BorderRadius.circular(8),
@@ -305,7 +282,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              profileData![3].toString().isEmpty
+                              profileData![3].toString().replaceAll('|','').isEmpty
                               ? profileData![2].toString()
                               : profileData![3].toString().replaceAll('|', ' '),
                               overflow: TextOverflow.ellipsis,

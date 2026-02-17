@@ -42,9 +42,15 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Profile App',
+
+      theme: ThemeData(
+        fontFamily: 'IBMPlexSans',
+        scaffoldBackgroundColor: const Color(0xFFFFFFFF),
+      ),
+
       home: supabase.auth.currentSession == null
-        ? const LoginPage()
-        :const ProfilePage(),
+        ? const LoginScreen()
+        :const ProfileScreen(),
     );
   }
 }
