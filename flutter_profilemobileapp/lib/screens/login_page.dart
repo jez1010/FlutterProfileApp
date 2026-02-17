@@ -8,31 +8,8 @@ import '../main.dart';
 import 'profile_page.dart';
 import 'register_page.dart';
 
-void main() {
-  runApp(LoginPage());
-}
-
-class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Color(0xFF686868)),
-        fontFamily: 'IBMPlexSans',
-      ),
-      home: const LoginScreen(title: 'Flutter Demo Home Page'),
-    );
-  }
-}
-
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key, required this.title});
-
-  final String title;
+  const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -97,7 +74,7 @@ class _LoginScreenState extends State<LoginScreen> {
               Navigator.pop(context);
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const ProfilePage()),
+                MaterialPageRoute(builder: (context) => const ProfileScreen()),
               );
             },
             child: Text('OK'),

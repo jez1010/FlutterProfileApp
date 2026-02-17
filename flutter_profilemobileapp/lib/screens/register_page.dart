@@ -661,7 +661,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       Navigator.pop(context);
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const ProfilePage()),
+                        MaterialPageRoute(builder: (context) => const ProfileScreen()),
                       );
                     }
                     if (result != null ) {
@@ -716,7 +716,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       Navigator.pop(context);
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const LoginPage()),
+                        MaterialPageRoute(builder: (context) => const LoginScreen()),
                       );
                 }
               ),
