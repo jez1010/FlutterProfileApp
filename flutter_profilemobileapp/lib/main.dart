@@ -44,8 +44,14 @@ class MyApp extends StatelessWidget {
       title: 'Profile App',
 
       theme: ThemeData(
+        useMaterial3: true,
         fontFamily: 'IBMPlexSans',
         scaffoldBackgroundColor: const Color(0xFFFFFFFF),
+        dialogTheme: const DialogThemeData(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.zero,
+          ),
+        ),
       ),
 
       home: supabase.auth.currentSession == null

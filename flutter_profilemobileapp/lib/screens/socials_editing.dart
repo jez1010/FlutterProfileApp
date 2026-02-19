@@ -29,8 +29,6 @@ class _SocialScreenState extends State<SocialScreen> {
   void initState() {
     super.initState();
 
-    print("Test: ${data}");
-
     _defaultControllers = [
       { "key": TextEditingController(), "value": TextEditingController() }, //LinkedIn
       { "key": TextEditingController(), "value": TextEditingController() }, //Github
@@ -65,12 +63,9 @@ class _SocialScreenState extends State<SocialScreen> {
       if (platform.isNotEmpty && value.isNotEmpty) {
         currentHandles[platform] = value;
       }
-
     }
-
+    
     SocialsStorage.socialsData = currentHandles;
-    print("Static variable: ${SocialsStorage.socialsData}");
-
   }
 
   //the actual page content
