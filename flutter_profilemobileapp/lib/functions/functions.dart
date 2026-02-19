@@ -5,7 +5,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../main.dart';
 import '../screens/login_page.dart';
-import '../screens/edit_page.dart';
 
 //grab current user
 String getUser(){
@@ -219,9 +218,18 @@ Widget standardDrawer(BuildContext context) {
                   content: (
                     Column(
                       mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Version 1.0.0"),
-                        Text("Built with Flutter and Supabase.")
+                        Text("Version 1.0.1"),
+                        Text("Built with Flutter and Supabase."),
+                        SizedBox(height: 5),
+                        Text(
+                          "Changelogs (1.0.1):",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                          )
+                        ),
+                        Text("> Fixed user registration.")
                       ],
                     )
                   ),
