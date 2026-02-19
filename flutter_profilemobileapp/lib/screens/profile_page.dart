@@ -3,12 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+//main file
+import '../main.dart';
+
 //local files
 import '../functions/functions.dart';
+import 'edit_page.dart';
 
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  final String? userId;
+  const ProfileScreen({super.key, this.userId});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -25,10 +30,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _loadProfile();
   }
 
+  @override
+  void didUpdateWidget(ProfileScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.userId != oldWidget.userId) {
+      _loadProfile();
+    }
+  }
+
   final ProfileRepository _repository = ProfileRepository();
 
   var defaultLinks = ["LinkedIn", "Github", "Facebook"];
   
+  Future<void> _loadProfile() async {
+    await Future.delayed(Duration(milliseconds: 500));
+    final data = await _repository.getProfileDetails(personId: widget.userId);
+
+    if (mounted) {
+      setState((){
+        profileData = data;
+        isLoading = false;
+      });
+    }
+  }
+
 
 
   Widget _schoolLists(Map<String, dynamic> eduMap) {
@@ -89,18 +114,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }).toList();
   }
 
-  Future<void> _loadProfile() async {
-    await Future.delayed(Duration(milliseconds: 500));
-    final data = await _repository.getProfileDetails();
-
-    if (mounted) {
-      setState((){
-        profileData = data;
-        isLoading = false;
-      });
-    }
-  }
-
   Future<void> _launchURL(String urlString) async {
     final Uri url = Uri.parse(urlString);
     if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
@@ -109,7 +122,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _contactFields() {
-    var mappedContacts = Map<String, String>.from(profileData![4] as Map);
+    var mappedContacts = Map<String, String>.from(profileData![3] as Map);
 
     return Column(
       children: [
@@ -179,11 +192,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildTags() {
-    if (profileData![7] == null) {
+    if (profileData![6] == null) {
       return const Text("User has yet to add tags.");
     }
 
-    List<String> tagList = _repository.parseTags(profileData![7]);
+    List<String> tagList = _repository.parseTags(profileData![6]);
     return Wrap(
       spacing: 5, 
       runSpacing: 5, 
@@ -218,10 +231,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-
-
   Widget _pageContents() {
-    print("Response from profile_page: ${profileData.toString()}");
     return ListView(
       padding: EdgeInsets.zero,
       children: [
@@ -262,9 +272,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         color: Color(0xFFFFFFFF),
                         image: DecorationImage(
                           image:
-                              !profileData![6].toString().startsWith("DEFAULT_PROFILE_")
-                                ? NetworkImage(profileData![6].toString())
-                                : AssetImage('assets/images/defaults/${profileData![6].toString()}.png'),
+                              !profileData![5].toString().startsWith("DEFAULT_PROFILE_")
+                                ? NetworkImage(profileData![5].toString())
+                                : AssetImage('assets/images/defaults/${profileData![5].toString()}.png'),
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -282,9 +292,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              profileData![3].toString().replaceAll('|','').isEmpty
-                              ? profileData![2].toString()
-                              : profileData![3].toString().replaceAll('|', ' '),
+                              profileData![2].toString().replaceAll('|','').isEmpty
+                              ? profileData![1].toString()
+                              : profileData![2].toString().replaceAll('|', ' '),
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
                               style: TextStyle(
@@ -295,7 +305,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
 
                             Text(
-                              "@${profileData![2].toString()}",
+                              "@${profileData![1].toString()}",
                               style: TextStyle(
                                 color: Color(0xFFC9C9C9),
                                 fontWeight: FontWeight.w300,
@@ -314,6 +324,58 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ],
         ),
         
+        //edit profile button
+        if (profileData![0] == supabase.auth.currentSession?.user.id)
+          Container(
+            margin: EdgeInsets.only(
+              top: 10,
+              left: 20,
+              right: 20,
+              bottom: 10,
+            ),
+            child: TextButton(
+              style: TextButton.styleFrom(
+                backgroundColor: Color(0xFFEEEEEE),
+
+                foregroundColor: Color(0xFF000000),
+
+                textStyle: TextStyle(
+                  fontSize: 16.0,
+                  fontFamily: 'IBMPlexSans',
+                  fontWeight: FontWeight.w300,
+                ),
+
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: 20, 
+                    child: Icon(Icons.create, size: 12)
+                  ),
+                  Text(
+                    "Edit Profile",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w400, 
+                      fontSize: 12
+                    ),
+                  ),
+                ],
+              ),
+              onPressed: () {
+                Navigator.pop(context);
+
+                if(context.mounted){
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => EditScreen())
+                  );
+                }
+              }
+            )
+          ),
+
         //description
         Container(
           margin: EdgeInsets.only(
@@ -340,10 +402,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 padding: EdgeInsets.all(10),
 
                 decoration: BoxDecoration(
-                  color: Color(0xFFE0E0E0),
+                  color: Color(0xFFEEEEEE),
                 ),
 
-                child: Text(profileData![5] ?? "No bio has been added.",),
+                child: Text(profileData![4] ?? "No bio has been added.",),
               ),
             ]
           ),
@@ -385,65 +447,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
 
             children: [
-              Text(
-                "Contact Details",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w300,
-                ),
-              ),
-
-              SizedBox(height: 10),
-
-              Container(
-                padding: EdgeInsets.all(10),
-
-                decoration: BoxDecoration(
-                  color: Color(0xFFE0E0E0),
-                ),
-
-                child: Row(
-                  children: [
-                    Container(
-                      width: 22,
-
-                      alignment: Alignment.centerLeft,
-                      child: Icon(
-                        Icons.email,
-                        size: 15,
-                      ),
-                    ),
-
-                    SizedBox(
-                      width: 50,
-                      child: Text(
-                        "Email",
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500
-                        ),
-                      )
-                    ),
-
-                    Text(
-                      profileData![1].toString(),
-                      style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w400,
-                      )
-                    )
-                  ]
-                ),
-              ),
-
-              SizedBox(height: 5),
-
               Container(
                 width: double.infinity,
                 padding: EdgeInsets.all(10),
 
                 decoration: BoxDecoration(
-                  color: Color(0xFFE0E0E0),
+                  color: Color(0xFFEEEEEE),
                 ),
 
                 child: Column(
@@ -466,7 +475,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
 
         //free space
-        if (profileData![8] != null && _repository.parseSchool(profileData![8]).isNotEmpty)
+        if (profileData![7] != null && _repository.parseSchool(profileData![7]).isNotEmpty)
           Container(
             margin: EdgeInsets.only(
               top: 10, 
@@ -487,7 +496,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                 SizedBox(height: 10),
 
-                _schoolLists(_repository.parseSchool(profileData![8]))
+                _schoolLists(_repository.parseSchool(profileData![7]))
               ],
             ),
           ),

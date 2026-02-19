@@ -25,6 +25,8 @@ class SocialsStorage {
 class _EditScreenState extends State<EditScreen> {
   //variables
 
+  bool _isUploading = false;
+
   //text fields
   final _editForm = GlobalKey<FormState>();
 
@@ -52,21 +54,20 @@ class _EditScreenState extends State<EditScreen> {
 
 
   void loadExistingTags(List<dynamic>? profileData) {
-    _usernameController.text = profileData![2] ?? "";
-    _firstNameController.text = profileData[3].split("|")[0] ?? "";
-    _lastNameController.text = profileData[3].split("|")[1] ?? "";
-    SocialsStorage.socialsData = profileData[4] != null
-      ? Map<String, dynamic>.from(profileData[4])
+    _usernameController.text = profileData![1] ?? "";
+    _firstNameController.text = profileData[2].split("|")[0] ?? "";
+    _lastNameController.text = profileData[2].split("|")[1] ?? "";
+    SocialsStorage.socialsData = profileData[3] != null
+      ? Map<String, dynamic>.from(profileData[3])
       : {};
-    _descController.text = profileData[5] ?? "";
-    _tagsController.text = profileData[7] ?? "";
+    _descController.text = profileData[4] ?? "";
+    _tagsController.text = profileData[6] ?? "";
+    selectedProfile = profileData[5];
   }
 
   @override
   void initState() {
     super.initState();
-
-    print("Test: ${_repository.retrieveProfile()}");
 
     profileData = _repository.retrieveProfile();
     
@@ -75,16 +76,29 @@ class _EditScreenState extends State<EditScreen> {
     }
   }
 
-  List<dynamic>? grabEverything() {
+  Future<void> grabEverything() async {
+    setState(() => _isUploading = true);
     
-    return [
-      _usernameController.text.trim,
-      _firstNameController.text.trim,
-      _lastNameController.text.trim,
-      _tagsController.text.trim,
-      _descController.text.trim,
-      SocialsStorage.socialsData
-    ];
+    try {
+      List<dynamic> inputs = [
+        _usernameController.text.trim(),
+        _firstNameController.text.trim(),
+        _lastNameController.text.trim(),
+        _tagsController.text.trim(),
+        _descController.text.trim(),
+        SocialsStorage.socialsData,
+        selectedProfile,
+      ];
+      if (mounted) {
+        await _repository.pushToDatabase(inputs, context);
+      }
+
+    } finally {
+      if (mounted) {
+        setState(() => _isUploading = false);
+      }
+    }
+    
   }
 
   void _launchURL(String urlString) async {
@@ -845,29 +859,39 @@ class _EditScreenState extends State<EditScreen> {
               height: 50,
 
               margin: EdgeInsets.all(10),
-              child: TextButton(
-                style: TextButton.styleFrom(
+              child: _isUploading
+                ? Center(key: UniqueKey(), child: CircularProgressIndicator())
+                : TextButton(
+                    style: TextButton.styleFrom(
 
-                  backgroundColor: Color(0xFF0F0A8F),
-                  disabledForegroundColor: Color(0xFF030231),
+                      backgroundColor: Color(0xFF0F0A8F),
+                      disabledForegroundColor: Color(0xFF030231),
 
-                  foregroundColor: Color(0xFFFFFFFF),
+                      foregroundColor: Color(0xFFFFFFFF),
 
-                  textStyle: TextStyle(
-                    fontSize: 16.0,
-                    fontFamily: 'IBMPlexSans',
-                    fontWeight: FontWeight.w300,
+                      textStyle: TextStyle(
+                        fontSize: 16.0,
+                        fontFamily: 'IBMPlexSans',
+                        fontWeight: FontWeight.w300,
+                      ),
+
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                    ),
+
+                    child: Text("Submit"),
+                    onPressed: _isUploading
+                      ? null
+                      : () async {
+                        await grabEverything();
+
+                        if(mounted) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => ProfileScreen())
+                          );
+                        }
+                      }
                   ),
-
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-                ),
-
-                child: Text("Submit"),
-                onPressed: () {
-                  updatedProfileData = grabEverything();
-                  print("${updatedProfileData}");
-                },
-              ),
             )
           ],
         ),

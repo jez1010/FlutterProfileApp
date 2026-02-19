@@ -241,6 +241,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         return null;
                       },
                     ),
+                    
                     Container(
                       margin: EdgeInsets.only(top: 5),
                       alignment: Alignment.centerLeft,
@@ -721,8 +722,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 }
               ),
             )
-
-
           ],
         ),
       ),
