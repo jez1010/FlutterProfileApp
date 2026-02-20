@@ -54,11 +54,22 @@ class MyApp extends StatelessWidget {
         ),
       ),
 
-      home: SafeArea(
-        child: supabase.auth.currentSession == null
+      builder: (context, child) {
+          return Container(
+            color: Colors.black, // The color of your "buffer"
+            child: SafeArea(
+              top: true,    // Let content go to the top (status bar)
+              left: true,   // Usually not needed for portrait
+              right: false,  // Usually not needed for portrait
+              bottom: true,  // THIS pushes all screens up above the nav bar
+              child: child!, 
+            ),
+          );
+        },
+
+      home: supabase.auth.currentSession == null
         ? const LoginScreen()
         :const ProfileScreen(),
-      ),
     );
   }
 }
