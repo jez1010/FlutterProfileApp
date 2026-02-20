@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter/services.dart';
 
 import 'screens/login_page.dart';
 import 'screens/profile_page.dart';
@@ -55,17 +56,23 @@ class MyApp extends StatelessWidget {
       ),
 
       builder: (context, child) {
-          return Container(
+        return AnnotatedRegion<SystemUiOverlayStyle>(
+          value: SystemUiOverlayStyle.light.copyWith(
+            statusBarColor: Colors.transparent,
+            systemNavigationBarColor: Colors.black,
+          ),
+          child: Container(
             color: Colors.black, // The color of your "buffer"
             child: SafeArea(
-              top: true,    // Let content go to the top (status bar)
-              left: true,   // Usually not needed for portrait
-              right: false,  // Usually not needed for portrait
-              bottom: true,  // THIS pushes all screens up above the nav bar
+              top: true,
+              left: true,
+              right: false,
+              bottom: true,
               child: child!, 
             ),
-          );
-        },
+          )
+        );
+      },
 
       home: supabase.auth.currentSession == null
         ? const LoginScreen()
