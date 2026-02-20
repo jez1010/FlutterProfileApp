@@ -530,11 +530,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       drawer: standardDrawer(context),
 
-      body: AnimatedSwitcher(
-        duration: Duration(milliseconds: 500),
-        child: profileData == null
-          ? Center(key: UniqueKey(), child: CircularProgressIndicator())
-          : _pageContents()
+      body: SafeArea(
+        child: AnimatedSwitcher(
+          duration: Duration(milliseconds: 500),
+          child: profileData == null
+            ? Center(key: UniqueKey(), child: CircularProgressIndicator())
+            : _pageContents()
+        ),
       ),
     );
   }

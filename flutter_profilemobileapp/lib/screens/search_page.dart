@@ -312,12 +312,17 @@ class _SearchScreenState extends State<SearchScreen> {
 
       drawer: standardDrawer(context),
 
-      body: AnimatedSwitcher(
-        duration: Duration(milliseconds: 500),
-        child: searchResults == null
-          ? Center(key: UniqueKey(), child: CircularProgressIndicator())
-          : _SearchhArea()
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: AnimatedSwitcher(
+            duration: Duration(milliseconds: 500),
+            child: searchResults == null
+              ? Center(key: UniqueKey(), child: CircularProgressIndicator())
+              : _SearchhArea()
+          ),
+        ),
       ),
+
     );
   }
 }
