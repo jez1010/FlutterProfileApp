@@ -10,7 +10,6 @@ import '../main.dart';
 import '../functions/functions.dart';
 import 'edit_page.dart';
 
-
 class ProfileScreen extends StatefulWidget {
   final String? userId;
   const ProfileScreen({super.key, this.userId});
@@ -41,51 +40,52 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final ProfileRepository _repository = ProfileRepository();
 
   var defaultLinks = ["LinkedIn", "Github", "Facebook"];
-  
+
   Future<void> _loadProfile() async {
     await Future.delayed(Duration(milliseconds: 500));
     final data = await _repository.getProfileDetails(personId: widget.userId);
 
     if (mounted) {
-      setState((){
+      setState(() {
         profileData = data;
         isLoading = false;
       });
     }
   }
 
-
-
   Widget _schoolLists(Map<String, dynamic> eduMap) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-          if (eduMap.containsKey('college') && eduMap['college'] is List && (eduMap['college'] as List).isNotEmpty)
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ..._buildEducationWidgets(eduMap,'college'),
-              ]
-            ),
-          if (eduMap.containsKey('highschool') && eduMap['highschool'] is List && (eduMap['highschool'] as List).isNotEmpty)
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ..._buildEducationWidgets(eduMap,'highschool'),
-              ]
-            ),
-          if (eduMap.containsKey('elementary') && eduMap['elementary'] is List && (eduMap['elementary'] as List).isNotEmpty)
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ..._buildEducationWidgets(eduMap,'elementary'),
-              ]
-            ),
-      ]
+        if (eduMap.containsKey('college') &&
+            eduMap['college'] is List &&
+            (eduMap['college'] as List).isNotEmpty)
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [..._buildEducationWidgets(eduMap, 'college')],
+          ),
+        if (eduMap.containsKey('highschool') &&
+            eduMap['highschool'] is List &&
+            (eduMap['highschool'] as List).isNotEmpty)
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [..._buildEducationWidgets(eduMap, 'highschool')],
+          ),
+        if (eduMap.containsKey('elementary') &&
+            eduMap['elementary'] is List &&
+            (eduMap['elementary'] as List).isNotEmpty)
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [..._buildEducationWidgets(eduMap, 'elementary')],
+          ),
+      ],
     );
   }
-  
-  List<Widget> _buildEducationWidgets(Map<String, dynamic> eduMap, String category) {
+
+  List<Widget> _buildEducationWidgets(
+    Map<String, dynamic> eduMap,
+    String category,
+  ) {
     if (!eduMap.containsKey(category) || eduMap[category] is! List) {
       return [const Text("No data available for this category")];
     }
@@ -94,14 +94,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     return list.map((item) {
       var school = item as Map<String, dynamic>;
-      
+
       String displayContent = "${school['name'] ?? 'Unknown School'}";
-      
-      if (school.containsKey('course')) displayContent += "\n${school['course']}";
-      if (school.containsKey('level'))  displayContent += " - ${school['level']}";
-      
+
+      if (school.containsKey('course'))
+        displayContent += "\n${school['course']}";
+      if (school.containsKey('level'))
+        displayContent += " - ${school['level']}";
+
       if (school.containsKey('year_start')) {
-        displayContent += "\n${school['year_start']} - ${school['year_end'] ?? 'Present'}";
+        displayContent +=
+            "\n${school['year_start']} - ${school['year_end'] ?? 'Present'}";
       }
 
       return Padding(
@@ -126,8 +129,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     return Column(
       children: [
-        if (mappedContacts.isEmpty)
-          Text("User has yet to add socials."),
+        if (mappedContacts.isEmpty) Text("User has yet to add socials."),
 
         for (String key in defaultLinks)
           if (mappedContacts.containsKey(key))
@@ -149,8 +151,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
         decoration: BoxDecoration(
           border: Border(
-            bottom: BorderSide(width: 0.5, color: Color(0xFF8D8D8D))
-          )
+            bottom: BorderSide(width: 0.5, color: Color(0xFF8D8D8D)),
+          ),
         ),
 
         child: Row(
@@ -158,14 +160,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Container(
               width: 22, // Increased for icon safety
               alignment: Alignment.centerLeft,
-              child: isDefault 
-                ? switch (key) {
-                    "Github" => const FaIcon(FontAwesomeIcons.github, size: 15),
-                    "Facebook" => const FaIcon(FontAwesomeIcons.facebook, size: 15),
-                    "LinkedIn" => const FaIcon(FontAwesomeIcons.linkedin, size: 15),
-                    _ => const Icon(Icons.link, size: 15,),
-                  }
-                : const Icon(Icons.link, size: 15),
+              child: isDefault
+                  ? switch (key) {
+                      "Github" => const FaIcon(
+                        FontAwesomeIcons.github,
+                        size: 15,
+                      ),
+                      "Facebook" => const FaIcon(
+                        FontAwesomeIcons.facebook,
+                        size: 15,
+                      ),
+                      "LinkedIn" => const FaIcon(
+                        FontAwesomeIcons.linkedin,
+                        size: 15,
+                      ),
+                      _ => const Icon(Icons.link, size: 15),
+                    }
+                  : const Icon(Icons.link, size: 15),
             ),
 
             SizedBox(
@@ -173,18 +184,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Text(
                 isDefault ? key[0].toUpperCase() + key.substring(1) : key,
                 style: const TextStyle(
-                  fontSize: 15, 
-                  fontWeight: FontWeight.w400
+                  fontSize: 15,
+                  fontWeight: FontWeight.w400,
                 ),
               ),
             ),
 
             Spacer(),
 
-            Icon(
-              Icons.arrow_outward_sharp,
-              size: 15,
-            ),
+            Icon(Icons.arrow_outward_sharp, size: 15),
           ],
         ),
       ),
@@ -198,35 +206,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     List<String> tagList = _repository.parseTags(profileData![6]);
     return Wrap(
-      spacing: 5, 
-      runSpacing: 5, 
+      spacing: 5,
+      runSpacing: 5,
       children: [
         for (String tag in tagList)
-          if (tag != "") 
+          if (tag != "")
             Container(
               height: 20,
-              padding: EdgeInsets.only(
-                top: 2,
-                bottom: 2,
-                left: 10, 
-                right: 10,
-              ),
-              
+              padding: EdgeInsets.only(top: 2, bottom: 2, left: 10, right: 10),
+
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: Color(0xFF8D8D8D)
-                )
+                border: Border.all(color: Color(0xFF8D8D8D)),
               ),
 
               child: Text(
                 tag,
-                style: TextStyle(
-                  fontWeight: FontWeight.w400,
-                  fontSize: 10,
-                ),
+                style: TextStyle(fontWeight: FontWeight.w400, fontSize: 10),
               ),
-            )
+            ),
       ],
     );
   }
@@ -272,17 +270,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         color: Color(0xFFFFFFFF),
                         image: DecorationImage(
                           image:
-                              !profileData![5].toString().startsWith("DEFAULT_PROFILE_")
-                                ? NetworkImage(profileData![5].toString())
-                                : AssetImage('assets/images/defaults/${profileData![5].toString()}.png'),
+                              !profileData![5].toString().startsWith(
+                                "DEFAULT_PROFILE_",
+                              )
+                              ? NetworkImage(profileData![5].toString())
+                              : AssetImage(
+                                  'assets/images/defaults/${profileData![5].toString()}.png',
+                                ),
                           fit: BoxFit.cover,
                         ),
                       ),
                     ),
 
-                    SizedBox(
-                      width: 10,
-                    ),
+                    SizedBox(width: 10),
 
                     Expanded(
                       child: Align(
@@ -292,9 +292,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              profileData![2].toString().replaceAll('|','').isEmpty
-                              ? profileData![1].toString()
-                              : profileData![2].toString().replaceAll('|', ' '),
+                              profileData![2]
+                                      .toString()
+                                      .replaceAll('|', '')
+                                      .isEmpty
+                                  ? profileData![1].toString()
+                                  : profileData![2].toString().replaceAll(
+                                      '|',
+                                      ' ',
+                                    ),
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
                               style: TextStyle(
@@ -312,27 +318,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 fontSize: 15,
                               ),
                             ),
-
                           ],
                         ),
                       ),
                     ),
-                  ]
+                  ],
                 ),
               ),
             ),
           ],
         ),
-        
+
         //edit profile button
         if (profileData![0] == supabase.auth.currentSession?.user.id)
           Container(
-            margin: EdgeInsets.only(
-              top: 10,
-              left: 20,
-              right: 20,
-              bottom: 10,
-            ),
+            margin: EdgeInsets.only(top: 10, left: 20, right: 20, bottom: 10),
             child: TextButton(
               style: TextButton.styleFrom(
                 backgroundColor: Color(0xFFEEEEEE),
@@ -350,50 +350,36 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  SizedBox(
-                    width: 20, 
-                    child: Icon(Icons.create, size: 12)
-                  ),
+                  SizedBox(width: 20, child: Icon(Icons.create, size: 12)),
                   Text(
                     "Edit Profile",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w400, 
-                      fontSize: 12
-                    ),
+                    style: TextStyle(fontWeight: FontWeight.w400, fontSize: 12),
                   ),
                 ],
               ),
               onPressed: () {
                 Navigator.pop(context);
 
-                if(context.mounted){
+                if (context.mounted) {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => EditScreen())
+                    MaterialPageRoute(builder: (context) => EditScreen()),
                   );
                 }
-              }
-            )
+              },
+            ),
           ),
 
         //description
         Container(
-          margin: EdgeInsets.only(
-            top: 10,
-            left: 20,
-            right: 20,
-            bottom: 5,
-          ),
+          margin: EdgeInsets.only(top: 10, left: 20, right: 20, bottom: 5),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
 
             children: [
               Text(
                 "About Me",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w300,
-                ),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300),
               ),
 
               Container(
@@ -401,48 +387,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                 padding: EdgeInsets.all(10),
 
-                decoration: BoxDecoration(
-                  color: Color(0xFFEEEEEE),
-                ),
+                decoration: BoxDecoration(color: Color(0xFFEEEEEE)),
 
-                child: Text(profileData![4] ?? "No bio has been added.",),
+                child: Text(profileData![4] ?? "No bio has been added."),
               ),
-            ]
+            ],
           ),
         ),
 
         //tags
-          Container(
-            margin: EdgeInsets.only(
-              top: 10,
-              left: 20,
-              right: 20,
-              bottom: 5,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Tags",
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w300,
-                  ),
-                ),
-                SizedBox(height: 5),
-                _buildTags(),
-              ],
-            )
+        Container(
+          margin: EdgeInsets.only(top: 10, left: 20, right: 20, bottom: 5),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Tags",
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w300),
+              ),
+              SizedBox(height: 5),
+              _buildTags(),
+            ],
           ),
+        ),
 
         //contacts
         Container(
-          margin: EdgeInsets.only(
-            top: 10,
-            left: 20,
-            right: 20,
-            bottom: 5,
-          ),
+          margin: EdgeInsets.only(top: 10, left: 20, right: 20, bottom: 5),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
 
@@ -451,13 +422,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 width: double.infinity,
                 padding: EdgeInsets.all(10),
 
-                decoration: BoxDecoration(
-                  color: Color(0xFFEEEEEE),
-                ),
+                decoration: BoxDecoration(color: Color(0xFFEEEEEE)),
 
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children:[
+                  children: [
                     Text(
                       "Socials",
                       style: TextStyle(
@@ -468,44 +437,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                     _contactFields(),
                   ],
-                )
+                ),
               ),
-            ]
+            ],
           ),
         ),
 
         //free space
-        if (profileData![7] != null && _repository.parseSchool(profileData![7]).isNotEmpty)
+        if (profileData![7] != null &&
+            _repository.parseSchool(profileData![7]).isNotEmpty)
           Container(
-            margin: EdgeInsets.only(
-              top: 10, 
-              left: 20, 
-              right: 20, 
-              bottom: 5
-            ),
+            margin: EdgeInsets.only(top: 10, left: 20, right: 20, bottom: 5),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
 
               children: [
                 Text(
                   "Schools",
-                  style: TextStyle(
-                    fontSize: 20, 
-                    fontWeight: FontWeight.w300),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300),
                 ),
 
                 SizedBox(height: 10),
 
-                _schoolLists(_repository.parseSchool(profileData![7]))
+                _schoolLists(_repository.parseSchool(profileData![7])),
               ],
             ),
           ),
-
-
-      ]
+      ],
     );
   }
-
 
   //actual build area
   @override
@@ -516,27 +476,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
       appBar: AppBar(
         title: const Text(
           "Profile",
-          style: TextStyle(
-            color: Color(0xFFFFFFFF)
-          ),
+          style: TextStyle(color: Color(0xFFFFFFFF)),
         ),
 
-        iconTheme: IconThemeData(
-          color: Color(0xFFFFFFFF), 
-          size: 30
-        ),
+        iconTheme: IconThemeData(color: Color(0xFFFFFFFF), size: 30),
         backgroundColor: Colors.transparent,
       ),
 
       drawer: standardDrawer(context),
 
-      body: SafeArea(
-        child: AnimatedSwitcher(
-          duration: Duration(milliseconds: 500),
-          child: profileData == null
+      body: AnimatedSwitcher(
+        duration: Duration(milliseconds: 500),
+        child: profileData == null
             ? Center(key: UniqueKey(), child: CircularProgressIndicator())
-            : _pageContents()
-        ),
+            : _pageContents(),
       ),
     );
   }

@@ -54,9 +54,11 @@ class MyApp extends StatelessWidget {
         ),
       ),
 
-      home: supabase.auth.currentSession == null
+      home: SafeArea(
+        child: supabase.auth.currentSession == null
         ? const LoginScreen()
         :const ProfileScreen(),
+      ),
     );
   }
 }

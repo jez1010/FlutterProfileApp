@@ -312,8 +312,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
       drawer: standardDrawer(context),
 
-      body: SafeArea(
-        child: SingleChildScrollView(
+      body: SingleChildScrollView(
           child: AnimatedSwitcher(
             duration: Duration(milliseconds: 500),
             child: searchResults == null
@@ -321,7 +320,6 @@ class _SearchScreenState extends State<SearchScreen> {
               : _SearchhArea()
           ),
         ),
-      ),
 
     );
   }
