@@ -57,20 +57,20 @@ class MyApp extends StatelessWidget {
 
       builder: (context, child) {
         return AnnotatedRegion<SystemUiOverlayStyle>(
-          value: SystemUiOverlayStyle.light.copyWith(
+          value: SystemUiOverlayStyle(
+            statusBarBrightness: Brightness.dark,
+            statusBarIconBrightness: Brightness.light,
             statusBarColor: Colors.transparent,
+
             systemNavigationBarColor: Colors.black,
+            systemNavigationBarIconBrightness: Brightness.light,
           ),
           child: Container(
-            color: Colors.black, // The color of your "buffer"
+            color: Colors.black,
             child: SafeArea(
-              top: true,
-              left: true,
-              right: false,
-              bottom: true,
-              child: child!, 
+              child: child!,
             ),
-          )
+          ),
         );
       },
 
