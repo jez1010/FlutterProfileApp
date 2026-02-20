@@ -246,8 +246,7 @@ class _EditScreenState extends State<EditScreen> {
 
       drawer: standardDrawer(context),
 
-      body: SafeArea(
-        child: SingleChildScrollView(
+      body: SingleChildScrollView(
           child: Column(
             children: [
                 GestureDetector(
@@ -897,7 +896,6 @@ class _EditScreenState extends State<EditScreen> {
             ],
           ),
         ),
-      ),
     );
   }
 }
