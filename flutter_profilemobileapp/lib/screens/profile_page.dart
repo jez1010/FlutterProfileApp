@@ -242,7 +242,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               height: 200,
 
               padding: EdgeInsets.only(
-                top: 70,
+                top: 100,
                 left: 10,
                 right: 10,
                 bottom: 20,
